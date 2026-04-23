@@ -1,0 +1,5 @@
+/api/session/login /.netlify/functions/session-login 200
+/api/session/me /.netlify/functions/session-me 200
+/api/session/heartbeat /.netlify/functions/session-heartbeat 200
+/api/session/logout /.netlify/functions/session-logout 200
+/* /index.html 200

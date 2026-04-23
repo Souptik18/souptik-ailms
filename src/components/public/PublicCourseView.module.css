@@ -1,0 +1,149 @@
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.courseTitle {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.subtitle,
+.creatorLine {
+  color: var(--muted);
+}
+
+.metaRow {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  color: var(--muted);
+}
+
+.metaRow span {
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.32rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.statGrid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.statCard {
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 0.85rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.statCard strong {
+  font-size: 1.25rem;
+  color: var(--brand-dark);
+}
+
+.statCard span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.courseLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.9fr);
+  gap: 1.1rem;
+}
+
+.courseMain {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 1.4rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: var(--shadow-soft);
+  padding: 1.15rem;
+}
+
+.panel ul {
+  margin: 0.6rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted);
+}
+
+.purchaseCard {
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 1.4rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem;
+  height: fit-content;
+  display: grid;
+  gap: 0.7rem;
+  position: sticky;
+  top: 9rem;
+}
+
+.cardEyebrow {
+  color: var(--accent-dark);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.supportText {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.previewList {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.actionStack {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.previewRow {
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 1rem;
+  background: #fff;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.actionStack :global(.btn-primary),
+.actionStack :global(.btn-outline) {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 980px) {
+  .statGrid,
+  .courseLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .purchaseCard {
+    position: static;
+  }
+}

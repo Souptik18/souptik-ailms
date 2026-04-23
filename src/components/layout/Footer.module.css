@@ -1,0 +1,73 @@
+.footer {
+  margin-top: 2.5rem;
+  border-top: 1px solid rgba(34, 197, 94, 0.2);
+  background:
+    radial-gradient(circle at top left, rgba(74, 222, 128, 0.16), transparent 22%),
+    linear-gradient(180deg, #14532d 0%, #0f3f22 100%);
+  color: #f8fafc;
+}
+
+.linkGrid {
+  width: calc(100% - (var(--page-gutter) * 2));
+  margin: 0 auto;
+  padding: 2.2rem 0 2rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.linkColumn {
+  padding: 1.25rem 1.25rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  display: grid;
+  gap: 1rem;
+}
+
+.linkColumn h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.linkColumn ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.linkColumn li {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.linkColumn li:hover {
+  color: #dcfce7;
+  transform: translateX(2px);
+}
+
+@media (max-width: 980px) {
+  .linkGrid {
+    grid-template-columns: 1fr;
+    gap: 1.35rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .linkGrid {
+    padding: 1.75rem 0 1.5rem;
+  }
+
+  .linkColumn {
+    padding: 1rem;
+  }
+}

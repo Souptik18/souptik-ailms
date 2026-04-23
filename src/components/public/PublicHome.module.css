@@ -1,0 +1,849 @@
+.hero {
+  margin-top: 1rem;
+  padding: 2.75rem 0 1.75rem;
+  min-height: calc(100svh - 150px);
+  display: grid;
+  gap: 2.2rem;
+  justify-items: center;
+  align-content: center;
+  background:
+    radial-gradient(circle at top, rgba(31, 122, 85, 0.08), transparent 32%),
+    linear-gradient(180deg, #fbfefc 0%, #f6fbf7 100%);
+  border: 1px solid rgba(31, 122, 85, 0.08);
+  border-radius: 1.75rem;
+}
+
+.heroBrand {
+  display: grid;
+  justify-items: center;
+  gap: 0.7rem;
+}
+
+.heroLogo {
+  width: min(100%, 320px);
+  height: auto;
+  object-fit: contain;
+}
+
+.heroTag {
+  margin: 0;
+  color: var(--brand-dark);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.searchBar {
+  width: min(100%, 1120px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  border: 1px solid rgba(31, 122, 85, 0.14);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.searchBar input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 1.25rem 1.35rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: transparent;
+}
+
+.searchBar input::placeholder {
+  color: rgba(15, 23, 42, 0.58);
+}
+
+.searchBar button {
+  border: 0;
+  border-left: 1px solid rgba(31, 122, 85, 0.14);
+  background: #fff;
+  color: var(--brand-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.searchBar button:hover {
+  background: rgba(31, 122, 85, 0.08);
+  color: var(--brand);
+}
+
+.shortcutGrid {
+  width: min(100%, 1320px);
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.shortcutCard {
+  border: 0;
+  background: transparent;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.95rem;
+  padding: 0.25rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  text-align: center;
+  cursor: pointer;
+}
+
+.shortcutCard span:last-child {
+  max-width: 12ch;
+}
+
+.shortcutIcon {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 1px solid rgba(31, 122, 85, 0.14);
+  background: linear-gradient(180deg, #f5fbf7 0%, #e9f6ee 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.shortcutCard:hover .shortcutIcon {
+  transform: translateY(-2px);
+  border-color: rgba(31, 122, 85, 0.28);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.rankingsTitle {
+  margin-top: 1.35rem;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.rankingsTitle h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  color: var(--brand-dark);
+  letter-spacing: 0.01em;
+}
+
+.rankingsBand {
+  margin-top: 1.25rem;
+  min-height: calc(100svh - 170px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.rankingCard,
+.noticePanel,
+.exploreBand {
+  border-radius: 1.4rem;
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 100%);
+  box-shadow: var(--shadow-soft);
+}
+
+.rankingCard {
+  padding: 1.15rem;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.rankingHeader {
+  display: flex;
+  align-items: center;
+}
+
+.rankingBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(31, 122, 85, 0.14) 0%, rgba(31, 122, 85, 0.08) 100%);
+  color: var(--brand-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rankingList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.rankingList li {
+  position: relative;
+  padding-left: 1rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.rankingList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.68rem;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.noticePanel {
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.95rem;
+}
+
+.noticeHeader {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.noticeHeader span,
+.eyebrow {
+  color: var(--brand);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.noticeHeader h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.noticeList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.noticeList li {
+  border: 1px solid rgba(31, 122, 85, 0.1);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 0.85rem 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.exploreBand {
+  margin-top: 1.25rem;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+  background: linear-gradient(180deg, #f7fcf9 0%, #eef7f1 100%);
+  border: 1px solid rgba(31, 122, 85, 0.14);
+  border-radius: 1rem;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.exploreHeadingRow {
+  padding: clamp(1.4rem, 3vw, 2.2rem) clamp(1.25rem, 3vw, 2.5rem) 1rem;
+  border-bottom: 1px solid rgba(31, 122, 85, 0.12);
+  background: linear-gradient(180deg, #f7fcf9 0%, #eef7f1 100%);
+}
+
+.exploreHeadingRow h2 {
+  margin: 0;
+  font-family: "Noto Sans", "Segoe UI", sans-serif;
+  font-size: clamp(1.85rem, 2.2vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--brand-dark);
+}
+
+.exploreCategoryTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+  border-bottom: 1px solid rgba(31, 122, 85, 0.12);
+  background: linear-gradient(180deg, #f7fcf9 0%, #eef7f1 100%);
+  margin-bottom: 0.15rem;
+}
+
+.exploreCategoryTabs button {
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #5c7568;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.95rem 1rem 0.9rem;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.exploreVideoGrid {
+  padding: 0 1.25rem 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+.exploreVideoCard {
+  background: #fff;
+  border: 1px solid rgba(31, 122, 85, 0.14);
+  border-radius: 0.55rem;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(24, 49, 38, 0.06);
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.exploreVideoCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(31, 122, 85, 0.28);
+  box-shadow: 0 16px 28px rgba(24, 49, 38, 0.1);
+}
+
+.exploreVideoCard img {
+  width: 100%;
+  aspect-ratio: 16 / 8.3;
+  object-fit: cover;
+  display: block;
+}
+
+.exploreVideoBody {
+  padding: 0.85rem 0.9rem 0.95rem;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.exploreVideoBody h3 {
+  margin: 0;
+  font-family: "Noto Sans", "Segoe UI", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.exploreVideoInstitute,
+.exploreVideoFaculty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.catalogBand {
+  margin-top: 1.25rem;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  background: #ffffff;
+  border: 1px solid rgba(10, 52, 101, 0.1);
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  width: 100%;
+  min-height: min(92svh, 1120px);
+}
+
+.catalogHero {
+  background:
+    linear-gradient(180deg, rgba(20, 83, 45, 0.96) 0%, rgba(31, 122, 85, 0.98) 100%),
+    radial-gradient(circle at top left, rgba(203, 255, 224, 0.16), transparent 28%);
+  color: #fff;
+}
+
+.catalogHeroInner {
+  padding: clamp(2rem, 4vw, 3.4rem) clamp(1.25rem, 4vw, 3.2rem) clamp(1.8rem, 3vw, 2.5rem);
+  display: grid;
+  gap: 1.7rem;
+}
+
+.catalogHeroTopline {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: rgba(232, 255, 241, 0.82);
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+}
+
+.catalogHeroHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.catalogHeroCopy {
+  display: grid;
+  gap: 0.7rem;
+  max-width: 760px;
+}
+
+.catalogHeroCopy h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #dff7ea;
+}
+
+.catalogHeroCopy p {
+  margin: 0;
+  color: rgba(239, 255, 245, 0.84);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.catalogHeroControls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.4rem;
+}
+
+.catalogSearchBar {
+  width: min(100%, 460px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.85rem 1.1rem 0.85rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 16px 30px rgba(13, 52, 34, 0.2);
+}
+
+.catalogSearchBar input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.catalogSearchBar input::placeholder {
+  color: #6b7280;
+}
+
+.catalogSearchBar svg {
+  color: #6b7280;
+}
+
+.catalogSort {
+  min-width: 220px;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.catalogSort span {
+  color: rgba(232, 255, 241, 0.82);
+  font-size: 0.95rem;
+}
+
+.catalogSort select {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(223, 247, 234, 0.58);
+  background: transparent;
+  color: #ffffff;
+  padding: 0 0 0.65rem;
+  font-size: 1.02rem;
+  font-weight: 600;
+  outline: 0;
+}
+
+.catalogSort option {
+  color: #111827;
+}
+
+.exploreWorkspace {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 0;
+}
+
+.exploreSidebar {
+  background: #ffffff;
+  border-right: 1px solid rgba(31, 122, 85, 0.12);
+  padding: 2rem 1.5rem 1.6rem;
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+}
+
+.exploreSidebarTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #1f2937;
+}
+
+.filterBlock {
+  padding: 1rem 0 0.92rem;
+  border-top: 1px solid rgba(31, 122, 85, 0.08);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.filterBlock span {
+  color: #5b6470;
+  font-size: 0.9rem;
+}
+
+.filterButton {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #1f2937;
+  font-size: 0.98rem;
+  font-weight: 500;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.filterButton::after {
+  content: '\25BE';
+  float: right;
+  color: #7b8794;
+  font-size: 0.85rem;
+}
+
+.exploreMain {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  justify-items: center;
+}
+
+.catalogResultsBar {
+  width: 100%;
+  max-width: 1120px;
+  padding: 1.35rem 1.5rem 0;
+  background: #ffffff;
+}
+
+.catalogResultsBar p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.exploreTabActive {
+  color: var(--brand-dark) !important;
+  border-bottom-color: var(--brand) !important;
+}
+
+.exploreCoursesGrid {
+  width: 100%;
+  max-width: 1120px;
+  padding: 1.25rem 1.5rem 1rem;
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+  align-items: stretch;
+  justify-content: center;
+  flex: 1;
+  background: #fff;
+}
+
+.exploreCourseCard {
+  background: #fff;
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100%;
+  max-width: 340px;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  min-height: 100%;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  box-shadow: 0 16px 30px rgba(24, 49, 38, 0.06);
+}
+
+.exploreCourseCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(31, 122, 85, 0.24);
+  box-shadow: 0 20px 34px rgba(24, 49, 38, 0.12);
+}
+
+.exploreCourseCard img {
+  width: 100%;
+  aspect-ratio: 16 / 8.5;
+  object-fit: cover;
+}
+
+.exploreCourseBody {
+  padding: 1rem 1rem 1.05rem;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.exploreCourseBody h3 {
+  margin: 0;
+  font-family: "Noto Sans", "Segoe UI", sans-serif;
+  font-size: 1.06rem;
+  font-weight: 700;
+  color: var(--brand-dark);
+  line-height: 1.32;
+}
+
+.exploreInstitute,
+.exploreFaculty {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.catalogEmptyState {
+  width: calc(100% - 3rem);
+  max-width: 1120px;
+  margin: 0 1.5rem 1.4rem;
+  border: 1px dashed rgba(31, 122, 85, 0.2);
+  border-radius: 1rem;
+  padding: 1.3rem;
+  text-align: center;
+  background: linear-gradient(180deg, #f8fcf9 0%, #ffffff 100%);
+}
+
+.catalogEmptyState h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.catalogEmptyState p {
+  margin: 0.45rem 0 0;
+  color: #6b7280;
+}
+
+.showAllCoursesButton {
+  margin: 0 0 clamp(1.35rem, 2vw, 1.8rem);
+  justify-self: center;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--accent-dark) 100%);
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  padding: 0.82rem 1.4rem;
+  cursor: pointer;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.showAllCoursesButton:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.sectionHeading {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.8vw, 2.2rem);
+}
+
+.sectionHeading p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.gridThree {
+  min-height: calc(100svh - 240px);
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-content: start;
+}
+
+.emptyState {
+  margin: 1.1rem 0 0;
+  padding: 1rem 1.1rem;
+  border: 1px dashed rgba(31, 122, 85, 0.28);
+  border-radius: 1rem;
+  background: rgba(31, 122, 85, 0.04);
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 1220px) {
+  .rankingsBand {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gridThree {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exploreCoursesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exploreWorkspace {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 980px) {
+  .hero {
+    padding-inline: 1rem;
+  }
+
+  .shortcutGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .catalogHeroControls {
+    grid-template-columns: 1fr;
+    display: grid;
+    align-items: stretch;
+  }
+
+  .catalogSearchBar {
+    width: 100%;
+  }
+
+  .catalogSort {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    gap: 1.7rem;
+    min-height: auto;
+    padding: 1.8rem 0.85rem 1.4rem;
+  }
+
+  .searchBar {
+    grid-template-columns: minmax(0, 1fr) 64px;
+  }
+
+  .searchBar input {
+    padding: 1rem 1rem;
+    font-size: 0.98rem;
+  }
+
+  .rankingsBand,
+  .shortcutGrid,
+  .gridThree {
+    grid-template-columns: 1fr;
+  }
+
+  .rankingCard,
+  .noticePanel {
+    padding: 1.05rem;
+  }
+
+  .rankingsBand,
+  .exploreBand,
+  .gridThree {
+    min-height: auto;
+  }
+
+  .catalogBand {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    min-height: auto;
+  }
+
+  .catalogHeroInner {
+    padding: 1.5rem 1rem;
+  }
+
+  .catalogHeroHeader,
+  .catalogHeroControls {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .exploreWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .exploreSidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(31, 122, 85, 0.12);
+    padding: 1.05rem 1rem 0.8rem;
+  }
+
+  .exploreTabs {
+    padding-inline: 1rem;
+  }
+
+  .exploreTabs button {
+    font-size: 0.95rem;
+    padding: 0.9rem 0.75rem 0.85rem;
+  }
+
+  .exploreCoursesGrid {
+    grid-template-columns: 1fr;
+    padding-inline: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .exploreHeadingRow {
+    padding: 1.2rem 1rem 1rem;
+  }
+
+  .exploreHeadingRow h2 {
+    font-size: 1.8rem;
+  }
+
+  .exploreTabs button {
+    font-size: 0.92rem;
+    padding: 0.85rem 0.6rem 0.8rem;
+  }
+
+  .showAllCoursesButton {
+    width: calc(100% - 2rem);
+    justify-self: stretch;
+    text-align: center;
+  }
+
+}
+

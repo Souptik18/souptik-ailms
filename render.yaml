@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: kiitx-session-api
+    runtime: node
+    plan: free
+    region: oregon
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm run server
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PORT
+        value: 10000
+      - key: SESSION_COOKIE_NAME
+        value: kiitx_session
+      - key: SESSION_COOKIE_SAME_SITE
+        value: none
+      - key: APP_ORIGIN
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
