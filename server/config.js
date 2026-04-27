@@ -97,17 +97,44 @@ export function getServerPort() {
   return Number.parseInt(process.env.API_PORT || '4001', 10)
 }
 
+function normalizeOrigin(value) {
+  const rawValue = String(value ?? '').trim().replace(/\/+$/, '')
+  if (!rawValue) return ''
+
+  try {
+    const url = new URL(rawValue)
+    const port = url.port ? `:${url.port}` : ''
+    return `${url.protocol}//${url.hostname.toLowerCase()}${port}`
+  } catch {
+    return rawValue.toLowerCase()
+  }
+}
+
 export function getAllowedOrigins() {
-  const rawOrigins = String(process.env.APP_ORIGIN || 'http://localhost:4000')
+  const configuredOrigins = String(process.env.APP_ORIGIN || 'http://localhost:4000')
     .split(',')
-    .map((value) => value.trim())
+    .map(normalizeOrigin)
     .filter(Boolean)
 
-  if (rawOrigins.length > 0) {
-    return rawOrigins
+  const allowLocalOrigins = process.env.ALLOW_LOCAL_ORIGINS !== 'false'
+  const localOrigins = allowLocalOrigins
+    ? [
+      'http://localhost:4000',
+      'http://127.0.0.1:4000',
+      'http://localhost:4173',
+      'http://127.0.0.1:4173',
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+    ].map(normalizeOrigin)
+    : []
+
+  const allowedOrigins = [...new Set([...configuredOrigins, ...localOrigins])]
+
+  if (allowedOrigins.length > 0) {
+    return allowedOrigins
   }
 
-  return ['http://localhost:4000']
+  return [normalizeOrigin('http://localhost:4000')]
 }
 
 export function createSessionId() {
@@ -120,4 +147,8 @@ export function getSessionSigningSecret() {
     || readPrivateKey()
     || `${process.env.FIREBASE_PROJECT_ID || 'kiitx'}:${SESSION_COOKIE_NAME}`
   )
+}
+
+export function getYouTubeApiKey() {
+  return String(process.env.YOUTUBE_API_KEY || process.env.VITE_YOUTUBE_API_KEY || '').trim()
 }

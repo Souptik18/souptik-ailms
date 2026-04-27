@@ -43,29 +43,7 @@ npm run dev
 
 The Vite dev server proxies `/api/*` requests to `http://localhost:4001`.
 
-## Netlify deploy
-
-This repo includes Netlify Functions for:
-
-- `/api/session/login`
-- `/api/session/me`
-- `/api/session/heartbeat`
-- `/api/session/logout`
-
-Netlify config is defined in `netlify.toml`.
-
-Required Netlify environment variables:
-
-- `NODE_ENV=production`
-- `APP_ORIGIN=https://your-netlify-domain.netlify.app`
-- `SESSION_COOKIE_NAME=kiitx_session`
-- `FIRESTORE_SESSION_COLLECTION=auth_sessions`
-- `FIRESTORE_USER_ROLE_COLLECTION=user_roles`
-- `FIREBASE_PROJECT_ID`
-- `FIREBASE_CLIENT_EMAIL`
-- `FIREBASE_PRIVATE_KEY`
-
-## Vercel + Render deploy (recommended workaround)
+## Vercel + Render deploy
 
 Frontend (Vercel):
 

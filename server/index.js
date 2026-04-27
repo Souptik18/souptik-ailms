@@ -11,6 +11,7 @@ import {
 import { getAdminAuth, getFirestore } from './firebaseAdmin.js'
 import { createSession, deleteSession, getSession, resolveUserRole, touchSession } from './sessionStore.js'
 import { answerVideoTutorQuestion } from './tutorService.js'
+import { getLmsVideos } from './youtubeVideoService.js'
 
 const app = express()
 const cookieOptions = getCookieOptions()
@@ -29,7 +30,18 @@ app.use(
   cors({
     origin: (origin, callback) => {
       const allowedOrigins = new Set(getAllowedOrigins())
-      if (!origin || allowedOrigins.has(origin)) {
+      const normalizedOrigin = (() => {
+        if (!origin) return ''
+        try {
+          const url = new URL(origin)
+          const port = url.port ? `:${url.port}` : ''
+          return `${url.protocol}//${url.hostname.toLowerCase()}${port}`
+        } catch {
+          return String(origin).trim().replace(/\/+$/, '').toLowerCase()
+        }
+      })()
+
+      if (!origin || allowedOrigins.has(normalizedOrigin)) {
         callback(null, true)
         return
       }
@@ -95,6 +107,20 @@ async function readAuthenticatedSession(request, response) {
 
 app.get('/api/health', (_request, response) => {
   response.json({ ok: true })
+})
+
+app.get('/api/lms-videos', async (request, response) => {
+  try {
+    const payload = await getLmsVideos({
+      categoryKey: request.query?.category,
+      subcategoryKey: request.query?.subcategory,
+      filterKey: request.query?.filter,
+      pageToken: request.query?.pageToken,
+    })
+    response.json(payload)
+  } catch {
+    response.status(500).json({ error: 'Unable to load LMS video feed.' })
+  }
 })
 
 app.post('/api/session/login', async (request, response) => {

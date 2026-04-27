@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { embedUrl } from '../../utils/siteUtils'
+import { embedUrl, thumbnailUrl } from '../../utils/siteUtils'
 import styles from './PublicCourseView.module.css'
 
 function PublicCourseView({
@@ -16,6 +17,7 @@ function PublicCourseView({
   isEnrolled,
 }) {
   const location = useLocation()
+  const [activePreviewIndex, setActivePreviewIndex] = useState(0)
   const stats = [
     { label: 'Rating', value: course.rating },
     { label: 'Learners', value: course.students.toLocaleString() },
@@ -35,6 +37,18 @@ function PublicCourseView({
   const enrollmentStatus = course.enrollmentStatus ?? 'Upcoming (Enrollment Open)'
   const requiresStudentAccess = currentUserRole && currentUserRole !== 'student'
   const canEnroll = authStateReady && currentUserRole === 'student' && !isEnrolled
+  const previewLessons = Array.isArray(course.previewLessons) && course.previewLessons.length > 0
+    ? course.previewLessons
+    : [{ title: 'Course Trailer', duration: 'Preview', youtubeId: course.youtubeId }]
+  const safePreviewIndex = activePreviewIndex >= previewLessons.length ? 0 : activePreviewIndex
+  const activePreview = previewLessons[safePreviewIndex] ?? previewLessons[0]
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActivePreviewIndex((current) => (current + 1) % previewLessons.length)
+    }, 6500)
+    return () => window.clearInterval(timer)
+  }, [previewLessons.length])
 
   const accessActions = (() => {
     if (!authStateReady) {
@@ -115,15 +129,50 @@ function PublicCourseView({
           </article>
 
           <article className={styles.panel}>
-            <h2>Course Trailer</h2>
+            <div className={styles.trailerHeader}>
+              <h2>Course Trailer</h2>
+              <div className={styles.carouselControls}>
+                <button
+                  type="button"
+                  className={styles.carouselControlBtn}
+                  onClick={() => setActivePreviewIndex((current) => (current - 1 + previewLessons.length) % previewLessons.length)}
+                  aria-label="Previous preview"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  className={styles.carouselControlBtn}
+                  onClick={() => setActivePreviewIndex((current) => (current + 1) % previewLessons.length)}
+                  aria-label="Next preview"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
             <div className="video-frame">
               <iframe
-                src={embedUrl(course.youtubeId)}
+                src={embedUrl(activePreview.youtubeId || course.youtubeId)}
                 title={`${course.title} trailer`}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
+            </div>
+            <div className={styles.trailerMeta}>
+              <strong>{activePreview.title}</strong>
+              <span>{activePreview.duration}</span>
+            </div>
+            <div className={styles.carouselDots}>
+              {previewLessons.map((lesson, index) => (
+                <button
+                  key={lesson.title}
+                  type="button"
+                  className={index === safePreviewIndex ? styles.carouselDotActive : styles.carouselDot}
+                  onClick={() => setActivePreviewIndex(index)}
+                  aria-label={`Go to preview lesson ${index + 1}`}
+                />
+              ))}
             </div>
           </article>
 
@@ -143,9 +192,29 @@ function PublicCourseView({
 
           <article className={styles.panel}>
             <h2>Preview Lessons</h2>
-            <div className={styles.previewList}>
-              {course.previewLessons.map((lesson, index) => (
+            <div className={styles.previewCarousel}>
+              {previewLessons.map((lesson, index) => (
                 <button key={lesson.title} type="button" className={styles.previewRow} onClick={() => onPreview(course.id, index)}>
+                  <img src={thumbnailUrl(lesson.youtubeId || course.youtubeId)} alt="" loading="lazy" />
+                  <div>
+                    <span>{lesson.title}</span>
+                    <small>{lesson.duration}</small>
+                  </div>
+                  <em>{index + 1}</em>
+                </button>
+              ))}
+            </div>
+            <div className={styles.previewList}>
+              {previewLessons.map((lesson, index) => (
+                <button
+                  key={`${lesson.title}-jump`}
+                  type="button"
+                  className={index === safePreviewIndex ? styles.previewRowActive : styles.previewRow}
+                  onClick={() => {
+                    setActivePreviewIndex(index)
+                    onPreview(course.id, index)
+                  }}
+                >
                   <span>{lesson.title}</span>
                   <span>{lesson.duration}</span>
                 </button>

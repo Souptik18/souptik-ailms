@@ -29,9 +29,6 @@ serviceAccountKey.json
 *.service-account.json
 .env.server
 
-# Local Netlify folder
-.netlify
-
 .vercel
 .env*.local
 .npm-cache/

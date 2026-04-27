@@ -207,4 +207,4 @@ export async function touchSession(session, request) {
   }
 }
 
-export async function deleteSession(_sessionId) {}
+export async function deleteSession() {}

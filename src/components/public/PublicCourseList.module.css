@@ -1,0 +1,369 @@
+.catalogBand {
+  --ink: #111827;
+  --muted: #5b6472;
+  --line: rgba(17, 24, 39, 0.12);
+  --paper: #ffffff;
+  --soft: #f4f7fb;
+  --accent: #0f766e;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  background: #f7f9fc;
+  color: var(--ink);
+}
+
+.catalogBand,
+.catalogBand *,
+.catalogBand *::before,
+.catalogBand *::after {
+  box-sizing: border-box;
+}
+
+.catalogHero {
+  position: relative;
+  min-height: clamp(320px, 48svh, 520px);
+  display: grid;
+  align-items: end;
+  isolation: isolate;
+  overflow: hidden;
+  background: #111827;
+}
+
+.catalogHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: url('https://images.pexels.com/photos/5428830/pexels-photo-5428830.jpeg?auto=compress&cs=tinysrgb&fm=webp&w=2000');
+  background-size: cover;
+  background-position: center 42%;
+  filter: saturate(1.04) contrast(1.04);
+}
+
+.catalogHero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(9, 13, 23, 0.86) 0%, rgba(9, 13, 23, 0.62) 48%, rgba(9, 13, 23, 0.22) 100%),
+    linear-gradient(180deg, rgba(9, 13, 23, 0.05) 0%, rgba(9, 13, 23, 0.8) 100%);
+}
+
+.catalogHeroInner {
+  width: min(1440px, 94%);
+  margin-inline: auto;
+  padding: clamp(22px, 4vw, 54px) 0;
+  display: grid;
+  gap: clamp(14px, 2.2vw, 26px);
+}
+
+.catalogHeroTopline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.78rem, 0.95vw, 0.9rem);
+  font-weight: 800;
+}
+
+.catalogHeroHeader {
+  display: grid;
+  gap: 12px;
+}
+
+.catalogHeroCopy {
+  display: grid;
+  gap: 10px;
+  max-width: 900px;
+}
+
+.catalogHeroCopy h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(3rem, min(7vw, 9svh), 6.8rem);
+  line-height: 0.84;
+  letter-spacing: 0;
+  max-width: 10ch;
+}
+
+.catalogHeroCopy p {
+  margin: 0;
+  max-width: 64ch;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: clamp(0.98rem, 1.18vw, 1.12rem);
+  line-height: 1.65;
+}
+
+.catalogHeroControls {
+  display: grid;
+  grid-template-columns: minmax(280px, 560px) minmax(220px, 300px);
+  gap: 12px;
+  align-items: end;
+}
+
+.catalogSearchBar {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111827;
+  padding: 0 14px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+}
+
+.catalogSearchBar input,
+.catalogSort select {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.catalogSort {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  padding: 0 14px;
+  backdrop-filter: blur(14px);
+}
+
+.catalogSort span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.catalogSort select {
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.catalogSort option {
+  color: #111827;
+}
+
+.exploreWorkspace {
+  width: min(1440px, 94%);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(220px, 270px) minmax(0, 1fr);
+  gap: clamp(18px, 3vw, 34px);
+  padding: clamp(22px, 4vw, 52px) 0;
+}
+
+.exploreSidebar {
+  position: sticky;
+  top: 132px;
+  align-self: start;
+  display: grid;
+  gap: 2px;
+  border-top: 1px solid var(--line);
+}
+
+.exploreSidebarTitle {
+  margin: 0;
+  padding: 14px 0;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+}
+
+.filterBlock {
+  display: grid;
+  gap: 8px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.filterBlock span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.filterButton {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.filterButton::after {
+  content: '+';
+  float: right;
+  color: var(--accent);
+}
+
+.exploreMain {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.catalogResultsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 42px;
+  border-bottom: 1px solid var(--line);
+}
+
+.catalogResultsBar p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  font-weight: 850;
+}
+
+.exploreCoursesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.exploreCourseCard {
+  min-height: clamp(190px, 25svh, 270px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: minmax(170px, 0.48fr) minmax(0, 1fr);
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(17, 24, 39, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.exploreCourseCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(15, 118, 110, 0.32);
+  box-shadow: 0 22px 56px rgba(17, 24, 39, 0.12);
+}
+
+.exploreCourseCard img {
+  width: 100%;
+  height: 100%;
+  min-height: 190px;
+  object-fit: cover;
+  display: block;
+}
+
+.exploreCourseBody {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: clamp(14px, 2vw, 22px);
+}
+
+.exploreCourseBody h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Noto Sans", "Segoe UI", sans-serif;
+  font-size: clamp(1.05rem, 1.35vw, 1.34rem);
+  line-height: 1.18;
+}
+
+.exploreFaculty,
+.exploreInstitute {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(0.86rem, 1vw, 0.94rem);
+  line-height: 1.45;
+}
+
+.exploreInstitute {
+  color: var(--accent);
+  font-weight: 850;
+}
+
+.catalogEmptyState {
+  border: 1px dashed rgba(15, 118, 110, 0.32);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: clamp(18px, 3vw, 32px);
+  text-align: center;
+}
+
+.catalogEmptyState h3,
+.catalogEmptyState p {
+  margin: 0;
+}
+
+.catalogEmptyState p {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.showAllCoursesButton {
+  justify-self: center;
+  min-height: 46px;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 8px;
+  background: var(--accent);
+  color: #ffffff;
+  padding: 0 18px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+@media (max-width: 1120px) {
+  .exploreWorkspace {
+    grid-template-columns: 1fr;
+  }
+
+  .exploreSidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exploreSidebarTitle {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .catalogHeroControls,
+  .exploreSidebar,
+  .exploreCoursesGrid,
+  .exploreCourseCard {
+    grid-template-columns: 1fr;
+  }
+
+  .catalogSort {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 2px;
+    padding-block: 8px;
+  }
+
+  .exploreCourseCard img {
+    min-height: 170px;
+    aspect-ratio: 16 / 9;
+  }
+}

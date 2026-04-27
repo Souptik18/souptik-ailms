@@ -1,53 +1,140 @@
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { ArrowRight, Bot, MessageCircle, Minus, Send, Sparkles, X } from 'lucide-react'
 import styles from './FloatingAssistant.module.css'
-import assistantGif from '../../Video Project.gif'
+
+const assistantGif = 'https://media.giphy.com/media/LMcB8XospGZO8UQq87/giphy.gif'
+
+const starterMessages = [
+  {
+    id: 'welcome',
+    role: 'assistant',
+    text: 'Hi, I can help you find courses, understand enrollment, or continue learning from your dashboard.',
+  },
+]
+
+const quickPrompts = [
+  'Find AI courses',
+  'How do I enroll?',
+  'Open my learnings',
+]
+
+function getAssistantReply(message) {
+  const normalized = message.toLowerCase()
+
+  if (normalized.includes('enroll')) {
+    return 'Open any course page and use the enrollment action. After enrollment, it appears in My Learnings for continuation.'
+  }
+
+  if (normalized.includes('learning') || normalized.includes('mylearning') || normalized.includes('my learnings')) {
+    return 'Use My Learnings from the top navigation to continue only the courses you are enrolled in.'
+  }
+
+  if (normalized.includes('ai') || normalized.includes('course') || normalized.includes('program')) {
+    return 'Browse the catalog and use search or categories to find AI, software, design, management, and engineering programs.'
+  }
+
+  return 'I can help with course discovery, enrollment, and learning navigation. Try asking for a course category or how to continue an enrolled course.'
+}
 
 function FloatingAssistant({ onOpenHelp }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [messageText, setMessageText] = useState('')
+  const [messages, setMessages] = useState(starterMessages)
+  const messageIdRef = useRef(0)
+
+  const hasUserMessages = useMemo(() => messages.some((message) => message.role === 'user'), [messages])
+
+  const sendMessage = (text) => {
+    const trimmedText = text.trim()
+    if (!trimmedText) return
+
+    messageIdRef.current += 1
+    const messageId = messageIdRef.current
+    const userMessage = {
+      id: `user-${messageId}`,
+      role: 'user',
+      text: trimmedText,
+    }
+    const assistantMessage = {
+      id: `assistant-${messageId}`,
+      role: 'assistant',
+      text: getAssistantReply(trimmedText),
+    }
+
+    setMessages((currentMessages) => [...currentMessages, userMessage, assistantMessage])
+    setMessageText('')
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    sendMessage(messageText)
+  }
 
   return (
     <div className={styles.assistantDock}>
       {isOpen ? (
-        <section className={styles.popup} aria-label="KIITX help popup">
-          <div className={styles.popupUtility}>
-            <span>KIITX Support</span>
-            <button
-              type="button"
-              className={styles.popupClose}
-              onClick={() => setIsOpen(false)}
-              aria-label="Close popup"
-            >
-              x
+        <section className={styles.chatPanel} aria-label="OpenCourse chat assistant">
+          <header className={styles.chatHeader}>
+            <div className={styles.chatIdentity}>
+              <span>
+                <Bot size={17} />
+              </span>
+              <div>
+                <strong>Course Assistant</strong>
+                <small>Online now</small>
+              </div>
+            </div>
+            <button type="button" className={styles.headerIconButton} onClick={() => setIsOpen(false)} aria-label="Close chat">
+              <X size={17} />
             </button>
+          </header>
+
+          <div className={styles.chatBody}>
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`${styles.messageBubble} ${message.role === 'user' ? styles.userBubble : styles.assistantBubble}`}
+              >
+                {message.text}
+              </div>
+            ))}
           </div>
 
-          <div className={styles.popupBody}>
-            <div className={styles.popupIntro}>
-              <strong>Need help?</strong>
-              <p>Open learner support and quick guidance from the assistant.</p>
+          {!hasUserMessages ? (
+            <div className={styles.quickPrompts} aria-label="Suggested questions">
+              {quickPrompts.map((prompt) => (
+                <button key={prompt} type="button" onClick={() => sendMessage(prompt)}>
+                  {prompt}
+                </button>
+              ))}
             </div>
+          ) : null}
 
-            <div className={styles.popupActions}>
-              <button
-                type="button"
-                className={styles.primaryAction}
-                onClick={() => {
-                  onOpenHelp()
-                  setIsOpen(false)
-                }}
-              >
-                Open Help
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryAction}
-                onClick={() => setIsOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          <form className={styles.chatComposer} onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={messageText}
+              onChange={(event) => setMessageText(event.target.value)}
+              placeholder="Ask about courses..."
+              aria-label="Message course assistant"
+            />
+            <button type="submit" aria-label="Send message">
+              <Send size={16} />
+            </button>
+          </form>
+
+          <button
+            type="button"
+            className={styles.helpLink}
+            onClick={() => {
+              onOpenHelp()
+              setIsOpen(false)
+            }}
+          >
+            Explore course help
+            <ArrowRight size={15} />
+          </button>
         </section>
       ) : null}
 
@@ -56,10 +143,10 @@ function FloatingAssistant({ onOpenHelp }) {
           type="button"
           className={styles.reopenButton}
           onClick={() => setIsMinimized(false)}
-          aria-label="Reopen KIITX help icon"
-          title="Reopen KIITX help icon"
+          aria-label="Reopen course assistant"
+          title="Reopen course assistant"
         >
-          +
+          <MessageCircle size={18} />
         </button>
       ) : (
         <div className={styles.iconShell}>
@@ -67,11 +154,15 @@ function FloatingAssistant({ onOpenHelp }) {
             type="button"
             className={styles.iconButton}
             onClick={() => setIsOpen((current) => !current)}
-            aria-label="Open KIITX help"
-            title="Open KIITX help"
+            aria-label="Open course assistant"
+            title="Open course assistant"
           >
+            <span className={styles.statusPulse} />
             <span className={styles.iconWrap}>
-              <img src={assistantGif} alt="" className={styles.iconVisual} />
+              <img src={assistantGif} alt="" className={styles.iconVisual} loading="lazy" />
+            </span>
+            <span className={styles.iconBadge}>
+              <Sparkles size={13} />
             </span>
           </button>
 
@@ -82,10 +173,10 @@ function FloatingAssistant({ onOpenHelp }) {
               setIsOpen(false)
               setIsMinimized(true)
             }}
-            aria-label="Minimize KIITX help icon"
-            title="Minimize KIITX help icon"
+            aria-label="Minimize course assistant"
+            title="Minimize course assistant"
           >
-            -
+            <Minus size={14} />
           </button>
         </div>
       )}

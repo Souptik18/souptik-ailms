@@ -1,70 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { embedUrl, thumbnailUrl } from '../../utils/siteUtils'
-import { getCourseFeedbackSummary } from '../../firebase/courseFeedbackService'
+import {
+  DEFAULT_LMS_CATEGORY,
+  DEFAULT_LMS_SUBCATEGORY,
+  flattenFallbackVideos,
+  getDefaultSubcategoryKey,
+  LMS_VIDEO_CATEGORIES,
+} from '../../../shared/lmsVideoCatalog'
 import styles from './PublicSubjectView.module.css'
 
 const API_BASE_URL = String(import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
 const buildApiUrl = (path) => (API_BASE_URL ? `${API_BASE_URL}${path}` : path)
 
-const SUBJECT_ORDER = ['commerce', 'arts', 'science', 'engineering']
-
-const SUBJECT_LABELS = {
-  commerce: 'Commerce',
-  arts: 'Arts',
-  science: 'Science',
-  engineering: 'Engineering',
-}
-
-const SUBJECT_VIDEOS = {
-  commerce: [
-    { youtubeId: 'M8M4McQhR7U', title: 'Principles of accounting basics', duration: '11:20' },
-    { youtubeId: 'i5f8bqYYwps', title: 'Micro economics demand and supply', duration: '10:08' },
-    { youtubeId: 'QYvXwsj0x6U', title: 'Business communication fundamentals', duration: '09:42' },
-    { youtubeId: 'fTTGALaRZoc', title: 'Financial statements quick read', duration: '12:15' },
-    { youtubeId: 'WEDIj9JBTC8', title: 'Marketing mix explained', duration: '08:54' },
-    { youtubeId: 'kBdfcR-8hEY', title: 'Consumer behavior models', duration: '10:40' },
-    { youtubeId: 'mB2h0zkVfJo', title: 'Cost concepts for managers', duration: '09:50' },
-    { youtubeId: '5G0Vf0VQm2w', title: 'HR planning overview', duration: '11:03' },
-    { youtubeId: 'VYM2zH2V9tQ', title: 'Operations and inventory control', duration: '10:11' },
-    { youtubeId: 'G2g7f9fok0A', title: 'Introduction to business law', duration: '09:27' },
-  ],
-  arts: [
-    { youtubeId: '9J1nJOivdyw', title: 'Critical thinking for humanities', duration: '10:06' },
-    { youtubeId: 'MbjObHmDbZo', title: 'History source analysis methods', duration: '12:04' },
-    { youtubeId: 'RUvJ4X8f6Jw', title: 'Political theory overview', duration: '09:18' },
-    { youtubeId: 'w7ejDZ8SWv8', title: 'Essay structuring techniques', duration: '08:33' },
-    { youtubeId: 'SqcY0GlETPk', title: 'Media literacy essentials', duration: '11:12' },
-    { youtubeId: '4UZrsTqkcW4', title: 'Sociology foundations', duration: '10:44' },
-    { youtubeId: '86FAWCzIe_4', title: 'Indian literature context', duration: '09:57' },
-    { youtubeId: '5fH2FOn1VSM', title: 'Philosophy argument mapping', duration: '08:49' },
-    { youtubeId: 'aircAruvnKk', title: 'Art appreciation basics', duration: '11:26' },
-    { youtubeId: 'fNk_zzaMoSs', title: 'Research writing and citations', duration: '10:21' },
-  ],
-  science: [
-    { youtubeId: 'aircAruvnKk', title: 'Scientific method in practice', duration: '10:14' },
-    { youtubeId: 'fNk_zzaMoSs', title: 'Cell biology essentials', duration: '09:35' },
-    { youtubeId: 'w4sLAQvEH-M', title: 'Laws of motion refresher', duration: '11:08' },
-    { youtubeId: 'MbjObHmDbZo', title: 'Thermodynamics introduction', duration: '12:03' },
-    { youtubeId: 'RUvJ4X8f6Jw', title: 'Chemical bonding essentials', duration: '09:59' },
-    { youtubeId: 'w7ejDZ8SWv8', title: 'Reaction rates and catalysts', duration: '08:47' },
-    { youtubeId: 'SqcY0GlETPk', title: 'Genetics inheritance patterns', duration: '10:55' },
-    { youtubeId: '4UZrsTqkcW4', title: 'Ecology and ecosystems', duration: '10:09' },
-    { youtubeId: '86FAWCzIe_4', title: 'Experimental data analysis', duration: '09:16' },
-    { youtubeId: '5fH2FOn1VSM', title: 'Lab report writing', duration: '08:58' },
-  ],
-  engineering: [
-    { youtubeId: 'MbjObHmDbZo', title: 'System design fundamentals', duration: '10:48' },
-    { youtubeId: 'RUvJ4X8f6Jw', title: 'Data structures refresher', duration: '09:42' },
-    { youtubeId: 'X48VuDVv0do', title: 'Operating systems basics', duration: '11:21' },
-    { youtubeId: 'w7ejDZ8SWv8', title: 'Computer networks core ideas', duration: '10:07' },
-    { youtubeId: 'SqcY0GlETPk', title: 'Database indexing strategies', duration: '09:54' },
-    { youtubeId: '4UZrsTqkcW4', title: 'OOP design principles', duration: '10:28' },
-    { youtubeId: '86FAWCzIe_4', title: 'Software testing essentials', duration: '08:51' },
-    { youtubeId: '5fH2FOn1VSM', title: 'CI/CD delivery pipeline', duration: '11:12' },
-    { youtubeId: 'aircAruvnKk', title: 'Cloud deployment intro', duration: '09:39' },
-    { youtubeId: 'fNk_zzaMoSs', title: 'Interview prep and coding rounds', duration: '10:15' },
-  ],
-}
+const SUBJECT_ORDER = Object.keys(LMS_VIDEO_CATEGORIES)
 
 const DOC_SUBTOPIC_LABELS = ['Concept notes', 'Worked examples', 'Practice worksheet']
 const PPT_SUBTOPIC_LABELS = ['Class slides', 'Visual diagrams', 'Quick recap deck']
@@ -76,7 +24,12 @@ const SAMPLE_RESOURCE_URLS = {
 
 function normalizeSubject(subject) {
   const normalized = String(subject ?? '').toLowerCase()
-  return SUBJECT_ORDER.includes(normalized) ? normalized : 'commerce'
+  return SUBJECT_ORDER.includes(normalized) ? normalized : DEFAULT_LMS_CATEGORY
+}
+
+function getDefaultFilterKey(categoryKey, subcategoryKey) {
+  const filters = LMS_VIDEO_CATEGORIES[categoryKey]?.subcategories?.[subcategoryKey]?.filters ?? {}
+  return Object.keys(filters)[0] ?? ''
 }
 
 function buildSections(videos) {
@@ -94,6 +47,40 @@ function buildSections(videos) {
     })),
     startIndex: index,
   }))
+}
+
+function VideoSkeletonGrid() {
+  return (
+    <section className={styles.catalogGrid} aria-label="Loading Computer Science videos">
+      {Array.from({ length: 12 }, (_, index) => (
+        <article key={index} className={styles.catalogSkeletonCard}>
+          <span className={styles.skeletonThumb} />
+          <span className={styles.skeletonLineWide} />
+          <span className={styles.skeletonLineShort} />
+        </article>
+      ))}
+    </section>
+  )
+}
+
+function buildPreviewContents(video, categoryLabel) {
+  const title = video?.title ?? 'Selected lesson'
+  return [
+    `Preview: ${title}`,
+    `${categoryLabel} concepts and learning outcomes`,
+    'Guided notes, examples, and practice resources',
+    'Certificate-ready project or assessment checkpoint',
+  ]
+}
+
+function isVideoEnrollmentMatch(enrollmentId, { subjectKey, subcategoryKey, youtubeId }) {
+  const parts = String(enrollmentId).split(':')
+  const enrolledSubjectKey = parts[0]
+  const enrolledSubcategoryKey = parts[1]
+  const enrolledYoutubeId = parts.length >= 4 ? parts.slice(3).join(':') : parts[2]
+  return enrolledSubjectKey === subjectKey
+    && enrolledSubcategoryKey === subcategoryKey
+    && enrolledYoutubeId === youtubeId
 }
 
 function getOnlineViewerUrl(format) {
@@ -119,22 +106,24 @@ async function parseApiPayload(response) {
 }
 
 function PublicSubjectView({
-  initialSubject = 'commerce',
+  initialSubject = 'computerscience',
+  initialSubcategory: initialSubcategoryProp,
   initialVideoIndex = 0,
   mode = 'detail',
   onSubjectNavigate,
   onVideoOpen,
-  onClose,
-  onBack,
-  backLabel = 'Back',
-  detailTitle,
-  detailSubtitle,
+  currentUserRole,
+  enrolledVideoIds = [],
+  onRegisterVideo,
+  onEnrollVideo,
   overlayMode = false,
-  courseId = '',
-  enableCourseActions = false,
   onTitleChange,
 }) {
   const activeSubject = normalizeSubject(initialSubject)
+  const initialSubcategory = initialSubcategoryProp
+    && LMS_VIDEO_CATEGORIES[activeSubject]?.subcategories?.[initialSubcategoryProp]
+    ? initialSubcategoryProp
+    : getDefaultSubcategoryKey(activeSubject) || DEFAULT_LMS_SUBCATEGORY
   const isDetailMode = mode === 'detail'
   const parsedInitialVideoIndex = Number(initialVideoIndex)
   const safeInitialSectionNumber = Number.isNaN(parsedInitialVideoIndex)
@@ -145,6 +134,14 @@ function PublicSubjectView({
     return Math.max(0, parsedInitialVideoIndex)
   })
   const [activeTab, setActiveTab] = useState('ppt')
+  const [activeSubcategory, setActiveSubcategory] = useState(initialSubcategory)
+  const [activeFilterKey, setActiveFilterKey] = useState(() => getDefaultFilterKey(activeSubject, initialSubcategory))
+  const [previewVideoIndex, setPreviewVideoIndex] = useState(null)
+  const [visibleVideoCount, setVisibleVideoCount] = useState(16)
+  const [videoFeed, setVideoFeed] = useState(() => flattenFallbackVideos(activeSubject, initialSubcategory))
+  const [isVideoFeedLoading, setIsVideoFeedLoading] = useState(false)
+  const [isLoadingMoreVideos, setIsLoadingMoreVideos] = useState(false)
+  const [nextPageToken, setNextPageToken] = useState('')
   const [openSectionByTab, setOpenSectionByTab] = useState({
     video: `section-${safeInitialSectionNumber}`,
     docs: 'section-1',
@@ -161,10 +158,65 @@ function PublicSubjectView({
   const [isHistoryLoading, setIsHistoryLoading] = useState(false)
   const tutorMessagesRef = useRef(null)
   const tutorHistoryCacheRef = useRef(new Map())
-  const [courseRatingSummary, setCourseRatingSummary] = useState({ averageRating: 0, totalReviews: 0 })
+  const loadMoreRef = useRef(null)
 
-  const videos = useMemo(() => SUBJECT_VIDEOS[activeSubject], [activeSubject])
+  useEffect(() => {
+    setActiveSubcategory(initialSubcategory)
+    setActiveFilterKey(getDefaultFilterKey(activeSubject, initialSubcategory))
+    setActiveVideoIndex(0)
+    setPreviewVideoIndex(null)
+    setVisibleVideoCount(16)
+    setNextPageToken('')
+  }, [activeSubject, initialSubcategory])
+
+  useEffect(() => {
+    let active = true
+    const fallbackVideos = flattenFallbackVideos(activeSubject, activeSubcategory)
+    setVideoFeed(fallbackVideos)
+    setIsVideoFeedLoading(true)
+    setIsLoadingMoreVideos(false)
+    setVisibleVideoCount(16)
+    setNextPageToken('')
+
+    const filterParam = activeFilterKey ? `&filter=${encodeURIComponent(activeFilterKey)}` : ''
+    fetch(buildApiUrl(`/api/lms-videos?category=${encodeURIComponent(activeSubject)}&subcategory=${encodeURIComponent(activeSubcategory)}${filterParam}`))
+      .then((response) => parseApiPayload(response))
+      .then((payload) => {
+        if (!active) return
+        const nextVideos = Array.isArray(payload?.videos) && payload.videos.length > 0 ? payload.videos : fallbackVideos
+        setVideoFeed(nextVideos)
+        setNextPageToken(typeof payload?.nextPageToken === 'string' ? payload.nextPageToken : '')
+        setActiveVideoIndex((currentIndex) => Math.min(currentIndex, Math.max(0, nextVideos.length - 1)))
+      })
+      .catch(() => {
+        if (active) setVideoFeed(fallbackVideos)
+      })
+      .finally(() => {
+        if (active) setIsVideoFeedLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [activeSubject, activeSubcategory, activeFilterKey])
+
+  const videos = videoFeed
+  const activeSubcategoryConfig = LMS_VIDEO_CATEGORIES[activeSubject].subcategories[activeSubcategory]
+  const activeFilters = Object.entries(activeSubcategoryConfig?.filters ?? {})
+  const activeFilterLabel = activeSubcategoryConfig?.filters?.[activeFilterKey]?.label ?? activeSubcategoryConfig?.label ?? 'Videos'
   const activeVideo = videos[activeVideoIndex] ?? videos[0]
+  const previewVideo = previewVideoIndex === null ? null : videos[previewVideoIndex] ?? null
+  const previewEnrollmentId = previewVideo ? `${activeSubject}:${activeSubcategory}:${previewVideoIndex}:${previewVideo.youtubeId}` : ''
+  const isPreviewEnrolled = previewVideo
+    ? enrolledVideoIds.some((enrollmentId) => isVideoEnrollmentMatch(enrollmentId, {
+      subjectKey: activeSubject,
+      subcategoryKey: activeSubcategory,
+      youtubeId: previewVideo.youtubeId,
+    }))
+    : false
+  const previewStudentPath = previewVideoIndex === null ? '' : `/student/subjects/${activeSubject}/${activeSubcategory}/${previewVideoIndex + 1}`
+  const visibleVideos = videos.slice(0, visibleVideoCount)
+  const hasMoreVideos = visibleVideoCount < videos.length || Boolean(nextPageToken)
   const sections = useMemo(() => buildSections(videos), [videos])
   const activeResourceViewerUrl = activeResourceViewer ? getOnlineViewerUrl(activeResourceViewer.format) : ''
 
@@ -179,27 +231,41 @@ function PublicSubjectView({
   }, [tutorMessages, isTutorLoading])
 
   useEffect(() => {
-    if (!enableCourseActions || !courseId) return
+    if (mode !== 'catalog' || previewVideo || !hasMoreVideos || !loadMoreRef.current) return undefined
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (visibleVideoCount < videos.length) {
+          setVisibleVideoCount((currentCount) => Math.min(currentCount + 16, videos.length))
+          return
+        }
 
-    let active = true
+        if (!nextPageToken || isLoadingMoreVideos) return
+        setIsLoadingMoreVideos(true)
+        const filterParam = activeFilterKey ? `&filter=${encodeURIComponent(activeFilterKey)}` : ''
+        fetch(buildApiUrl(`/api/lms-videos?category=${encodeURIComponent(activeSubject)}&subcategory=${encodeURIComponent(activeSubcategory)}${filterParam}&pageToken=${encodeURIComponent(nextPageToken)}`))
+          .then((response) => parseApiPayload(response))
+          .then((payload) => {
+            const incomingVideos = Array.isArray(payload?.videos) ? payload.videos : []
+            setVideoFeed((currentVideos) => {
+              const existingIds = new Set(currentVideos.map((video) => video.youtubeId))
+              const uniqueIncomingVideos = incomingVideos.filter((video) => video?.youtubeId && !existingIds.has(video.youtubeId))
+              return uniqueIncomingVideos.length > 0 ? [...currentVideos, ...uniqueIncomingVideos] : currentVideos
+            })
+            setNextPageToken(typeof payload?.nextPageToken === 'string' ? payload.nextPageToken : '')
+            setVisibleVideoCount((currentCount) => currentCount + Math.max(16, incomingVideos.length))
+          })
+          .catch(() => {
+            setNextPageToken('')
+          })
+          .finally(() => {
+            setIsLoadingMoreVideos(false)
+          })
+      }
+    }, { rootMargin: '320px 0px' })
 
-    getCourseFeedbackSummary(courseId)
-      .then((payload) => {
-        if (!active) return
-        setCourseRatingSummary({
-          averageRating: Number(payload.averageRating ?? 0),
-          totalReviews: Number(payload.totalReviews ?? 0),
-        })
-      })
-      .catch(() => {
-        if (!active) return
-        setCourseRatingSummary({ averageRating: 0, totalReviews: 0 })
-      })
-
-    return () => {
-      active = false
-    }
-  }, [courseId, enableCourseActions])
+    observer.observe(loadMoreRef.current)
+    return () => observer.disconnect()
+  }, [activeFilterKey, activeSubject, activeSubcategory, hasMoreVideos, isLoadingMoreVideos, mode, nextPageToken, previewVideo, visibleVideoCount, videos.length])
 
   const handleSubjectChange = (subjectKey) => {
     if (typeof onSubjectNavigate === 'function') {
@@ -492,21 +558,29 @@ function PublicSubjectView({
           ) : (
             <>
               <div className={styles.sidebarHeader}>
-                <h2>Choose Subject</h2>
+                <h2>Computer Science</h2>
                 <button type="button" className={styles.panelToggleBtn} onClick={() => setIsLeftPanelCollapsed(true)} title="Close subjects">
                   &laquo;
                 </button>
               </div>
-              <div className={styles.subjectStack}>
-                {SUBJECT_ORDER.map((subjectKey) => (
+              <div className={styles.subcategoryStack}>
+                <h3>Categories</h3>
+                {Object.entries(LMS_VIDEO_CATEGORIES[activeSubject].subcategories).map(([subcategoryKey, subcategory]) => (
                   <button
-                    key={subjectKey}
+                    key={subcategoryKey}
                     type="button"
-                    className={activeSubject === subjectKey ? styles.subjectActive : ''}
-                    onClick={() => handleSubjectChange(subjectKey)}
-                    title={`Switch to ${SUBJECT_LABELS[subjectKey]}`}
+                    className={activeSubcategory === subcategoryKey ? styles.subjectActive : ''}
+                    onClick={() => {
+                      setActiveSubcategory(subcategoryKey)
+                      setActiveFilterKey(getDefaultFilterKey(activeSubject, subcategoryKey))
+                      setActiveVideoIndex(0)
+                      setPreviewVideoIndex(null)
+                      setVisibleVideoCount(16)
+                      setNextPageToken('')
+                    }}
+                    title={`Open ${subcategory.label}`}
                   >
-                    {SUBJECT_LABELS[subjectKey]}
+                    {subcategory.label}
                   </button>
                 ))}
               </div>
@@ -524,29 +598,143 @@ function PublicSubjectView({
         </button>
       )}
 
-      <article className={styles.content}>
+      <article className={`${styles.content} ${mode === 'catalog' ? styles.catalogContent : ''}`}>
         {mode === 'catalog' ? (
-          <section className={styles.catalogGrid}>
-            {videos.map((video, index) => (
-              <button
-                key={`${video.youtubeId}-${video.title}`}
-                type="button"
-                className={styles.catalogCard}
-                onClick={() => {
-                  if (typeof onVideoOpen === 'function') {
-                    onVideoOpen(activeSubject, index)
-                  }
-                }}
-                title={`Open ${video.title}`}
-              >
-                <img src={thumbnailUrl(video.youtubeId)} alt={video.title} loading="lazy" />
-                <div className={styles.cardMeta}>
-                  <span>{index + 1}. {video.title}</span>
-                  <small>{video.duration}</small>
+          <>
+            {activeFilters.length > 0 ? (
+              <nav className={styles.filterChips} aria-label={`${activeSubcategoryConfig?.label} filters`}>
+                {activeFilters.map(([filterKey, filter]) => (
+                  <button
+                    key={filterKey}
+                    type="button"
+                    className={activeFilterKey === filterKey ? styles.filterChipActive : ''}
+                    onClick={() => {
+                      setActiveFilterKey(filterKey)
+                      setActiveVideoIndex(0)
+                      setPreviewVideoIndex(null)
+                      setVisibleVideoCount(16)
+                      setNextPageToken('')
+                    }}
+                    title={`Show ${filter.label}`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </nav>
+            ) : null}
+            {isVideoFeedLoading ? (
+              <VideoSkeletonGrid />
+            ) : previewVideo ? (
+              <section className={styles.previewPage}>
+                <div className={styles.previewMain}>
+                  <button type="button" className={styles.previewBackButton} onClick={() => setPreviewVideoIndex(null)}>
+                    Back to videos
+                  </button>
+                  <div className={styles.previewVideoFrame}>
+                    <iframe
+                      src={embedUrl(previewVideo.youtubeId)}
+                      title={`${previewVideo.title} preview`}
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className={styles.previewDetails}>
+                    <span>{activeFilterLabel}</span>
+                    <h2>{previewVideo.title}</h2>
+                    <p>
+                      A structured preview for this Computer Science learning track, including the instructor channel,
+                      expected contents, duration, and enrollment actions before opening the full learner workspace.
+                    </p>
+                  </div>
+                  <div className={styles.previewContentList}>
+                    <h3>What this course includes</h3>
+                    {buildPreviewContents(previewVideo, activeFilterLabel).map((item, index) => (
+                      <article key={item}>
+                        <strong>{String(index + 1).padStart(2, '0')}</strong>
+                        <span>{item}</span>
+                      </article>
+                    ))}
+                  </div>
                 </div>
-              </button>
-            ))}
-          </section>
+
+                <aside className={styles.previewAside}>
+                  <img src={previewVideo.thumbnail || thumbnailUrl(previewVideo.youtubeId)} alt="" loading="lazy" />
+                  <div className={styles.previewAsideBody}>
+                    <span className={styles.previewPrice}>Free</span>
+                    {currentUserRole === 'student' ? (
+                      isPreviewEnrolled ? (
+                        <>
+                          <button type="button" className={styles.previewPrimaryCta} disabled>
+                            Enrolled
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.previewSecondaryCta}
+                            onClick={() => onVideoOpen?.(activeSubject, previewVideoIndex, activeSubcategory)}
+                          >
+                            Continue to course
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          className={styles.previewPrimaryCta}
+                          onClick={() => onEnrollVideo?.(previewEnrollmentId)}
+                        >
+                          Enroll now
+                        </button>
+                      )
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.previewPrimaryCta}
+                        onClick={() => onRegisterVideo?.(previewStudentPath)}
+                      >
+                        Register now
+                      </button>
+                    )}
+                    <div className={styles.previewMetaGrid}>
+                      <span>Instructor</span>
+                      <strong>{previewVideo.channelTitle ?? 'Curated channel'}</strong>
+                      <span>Duration</span>
+                      <strong>{previewVideo.duration}</strong>
+                      <span>Views</span>
+                      <strong>{Number(previewVideo.viewCount ?? 0).toLocaleString()}</strong>
+                      <span>Level</span>
+                      <strong>Beginner to advanced</strong>
+                    </div>
+                  </div>
+                </aside>
+              </section>
+            ) : (
+              <section className={styles.catalogGrid}>
+              {visibleVideos.map((video, index) => (
+                <button
+                  key={`${activeSubcategory}-${activeFilterKey}-${video.youtubeId}-${index}`}
+                  type="button"
+                  className={styles.catalogCard}
+                  onClick={() => {
+                    setActiveVideoIndex(index)
+                    setPreviewVideoIndex(index)
+                  }}
+                  title={`Preview ${video.title}`}
+                >
+                  <img src={video.thumbnail || thumbnailUrl(video.youtubeId)} alt={video.title} loading="lazy" />
+                  <div className={styles.cardMeta}>
+                    <span>{index + 1}. {video.title}</span>
+                    <small>{video.channelTitle ?? 'Curated channel'} · {video.duration}</small>
+                  </div>
+                </button>
+              ))}
+              {hasMoreVideos ? (
+                <div ref={loadMoreRef} className={styles.lazyLoadSentinel}>
+                  {isLoadingMoreVideos ? 'Loading more videos...' : 'Scroll for more videos'}
+                </div>
+              ) : null}
+              </section>
+            )}
+          </>
         ) : (
           <div className={`${styles.watchRow} ${isResourcePanelCollapsed ? styles.watchRowExpanded : ''}`}>
             <section className={`${styles.playerPanel} ${activeResourceViewer ? styles.viewerOpen : ''}`}>

@@ -68,7 +68,7 @@
   width: 100%;
   margin: 0;
   padding: 0;
-  min-height: calc(100vh - 220px);
+  min-height: var(--viewport-content-height);
   border: none;
   background: transparent;
   box-shadow: none;

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Noto+Sans:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -47,6 +47,8 @@
   --shadow-soft: 0 12px 28px rgba(24, 49, 38, 0.08);
   --danger: #b42318;
   --page-gutter: clamp(12px, 2vw, 26px);
+  --topbar-height: 116px;
+  --viewport-content-height: calc(100svh - var(--topbar-height));
 }
 
 .dark {
@@ -91,6 +93,13 @@
       linear-gradient(180deg, #f8fcf9 0%, #f4f8f4 52%, #eef5ef 100%);
   }
 
+  .dark body {
+    background-image:
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 30%),
+      radial-gradient(circle at top right, rgba(192, 132, 252, 0.14), transparent 26%),
+      linear-gradient(180deg, #050a13 0%, #070f1d 52%, #0a1524 100%);
+  }
+
   button,
   input,
   textarea,
@@ -107,7 +116,7 @@
   h3,
   h4 {
     margin: 0;
-    font-family: "Merriweather", Georgia, serif;
+    font-family: "Playfair Display", Georgia, serif;
     color: var(--ink);
   }
 
@@ -118,7 +127,7 @@
 
 @layer components {
   .public-shell {
-    min-height: calc(100vh - 220px);
+    min-height: var(--viewport-content-height);
   }
 
   .public-shell-center {
@@ -132,7 +141,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    top: 88px;
+    top: var(--topbar-height);
     z-index: 22;
     background: var(--surface-alt);
   }
