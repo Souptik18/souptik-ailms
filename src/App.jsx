@@ -11,6 +11,7 @@ import PublicCourseList from './components/public/PublicCourseList'
 import PublicCourseView from './components/public/PublicCourseView'
 import PublicHome from './components/public/PublicHome'
 import PublicInstructorView from './components/public/PublicInstructorView'
+import PublicJobsView from './components/public/PublicJobsView'
 import PublicSubjectView from './components/public/PublicSubjectView'
 import InstructorView from './components/workspace/InstructorView'
 import RoleWorkspaceLayout from './components/workspace/RoleWorkspaceLayout'
@@ -23,7 +24,7 @@ import { DashboardPage } from './dashboard/pages/dashboard-page'
 import { LoginPage } from './dashboard/pages/login-page'
 import { SettingsPage } from './dashboard/pages/settings-page'
 import { StudentsPage } from './dashboard/pages/students-page'
-import { findPublicCatalogCourse, publicCatalogCourses } from './data/publicCatalogData'
+import { publicCatalogCourses } from './data/publicCatalogData'
 import { ADMIN_EMAIL, courses, instructors, workspaceMenu } from './data/siteData'
 import {
   getCurrentSession,
@@ -36,16 +37,17 @@ import {
 } from './firebase/authService'
 
 const ENROLLMENT_STORAGE_PREFIX = 'kiitx-enrollments'
+const LMS_VIDEO_ENROLLMENT_STORAGE_PREFIX = 'kiitx-video-enrollments'
 const HEARTBEAT_INTERVAL_MS = 60 * 1000
 const SUBJECT_BY_CATEGORY = {
-  Development: 'engineering',
-  'Data Science': 'science',
-  'IT and Software': 'engineering',
-  Management: 'commerce',
-  Commerce: 'commerce',
-  Science: 'science',
-  Engineering: 'engineering',
-  Arts: 'arts',
+  Development: 'computerscience',
+  'Data Science': 'computerscience',
+  'IT and Software': 'computerscience',
+  Management: 'computerscience',
+  Commerce: 'computerscience',
+  Science: 'computerscience',
+  Engineering: 'computerscience',
+  Arts: 'computerscience',
 }
 
 function slugifyCourseTitle(title = '') {
@@ -160,8 +162,10 @@ function MarketplaceFrame({
   onOpenAbout,
   onOpenCatalog,
   onOpenHelp,
+  onOpenJobs,
   onOpenLocalChapters,
   onOpenMyLearnings,
+  onOpenMyProfile,
   onLogoClick,
   onOpenSubject,
   showFooter = true,
@@ -193,8 +197,10 @@ function MarketplaceFrame({
           onOpenAbout={onOpenAbout}
           onOpenCatalog={onOpenCatalog}
           onOpenHelp={onOpenHelp}
+          onOpenJobs={onOpenJobs}
           onOpenLocalChapters={onOpenLocalChapters}
           onOpenMyLearnings={onOpenMyLearnings}
+          onOpenMyProfile={onOpenMyProfile}
           adminLoggedIn={false}
           onBackToMarketplace={onLogoClick}
           onLogoClick={onLogoClick}
@@ -281,7 +287,7 @@ function StudentCourseRoute({ courseCollection, enrolledCourseIds, onVideoViewCh
   return (
     <PublicSubjectView
       key={`${course.id}-${course.category}`}
-      initialSubject={SUBJECT_BY_CATEGORY[course.category] ?? 'engineering'}
+      initialSubject={SUBJECT_BY_CATEGORY[course.category] ?? 'computerscience'}
       initialVideoIndex={0}
       mode="detail"
       detailTitle={course.title}
@@ -320,14 +326,15 @@ function InstructorRoute({ onOpenCourse, onOpenInstructor, onAddCart, onPreview 
 }
 
 function SubjectDetailRoute({ onSubjectNavigate, onVideoNavigate }) {
-  const { subject, videoIndex } = useParams()
+  const { subject, subcategory, videoIndex } = useParams()
   const parsedIndex = Number.parseInt(videoIndex ?? '1', 10)
   const initialVideoIndex = Number.isNaN(parsedIndex) ? 0 : Math.max(0, parsedIndex - 1)
 
   return (
     <PublicSubjectView
-      key={`${subject ?? 'commerce'}-${initialVideoIndex}`}
-      initialSubject={subject ?? 'commerce'}
+      key={`${subject ?? 'computerscience'}-${subcategory ?? 'default'}-${initialVideoIndex}`}
+      initialSubject={subject ?? 'computerscience'}
+      initialSubcategory={subcategory}
       initialVideoIndex={initialVideoIndex}
       mode="detail"
       onSubjectNavigate={onSubjectNavigate}
@@ -338,7 +345,7 @@ function SubjectDetailRoute({ onSubjectNavigate, onVideoNavigate }) {
 
 function SubjectRouteRedirect() {
   const { subject } = useParams()
-  return <Navigate to={`/subjects/${subject ?? 'commerce'}/1`} replace />
+  return <Navigate to={`/subjects/${subject ?? 'computerscience'}/1`} replace />
 }
 
 function AdminProtectedLayout({ authenticated, onLogout }) {
@@ -355,6 +362,7 @@ function App() {
 
   const [cartCourseIds, setCartCourseIds] = useState([])
   const [enrolledCourseIds, setEnrolledCourseIds] = useState([])
+  const [enrolledVideoIds, setEnrolledVideoIds] = useState([])
   const [studentTab, setStudentTab] = useState('My Learnings')
   const [instructorTab, setInstructorTab] = useState(workspaceMenu.instructor[0])
   const [previewState, setPreviewState] = useState(null)
@@ -415,12 +423,14 @@ function App() {
           setCurrentUserUid(null)
           setCurrentUserRole(null)
           setEnrolledCourseIds([])
+          setEnrolledVideoIds([])
         }
       } catch {
         if (!active) return
         setCurrentUserUid(null)
         setCurrentUserRole(null)
         setEnrolledCourseIds([])
+        setEnrolledVideoIds([])
       } finally {
         if (active) {
           setAuthStateReady(true)
@@ -445,6 +455,7 @@ function App() {
     if (typeof document === 'undefined') return undefined
     const isVideoRoute =
       location.pathname.startsWith('/student/course/')
+      || location.pathname.startsWith('/student/subjects/')
       || /^\/subjects\/[^/]+\/\d+$/.test(location.pathname)
 
     const previousOverflow = document.body.style.overflow
@@ -488,8 +499,29 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !currentUserUid) return
+    const savedEnrollmentIds = window.localStorage.getItem(`${LMS_VIDEO_ENROLLMENT_STORAGE_PREFIX}:${currentUserUid}`)
+    if (!savedEnrollmentIds) {
+      setEnrolledVideoIds([])
+      return
+    }
+
+    try {
+      const parsedEnrollmentIds = JSON.parse(savedEnrollmentIds)
+      setEnrolledVideoIds(Array.isArray(parsedEnrollmentIds) ? parsedEnrollmentIds : [])
+    } catch {
+      setEnrolledVideoIds([])
+    }
+  }, [currentUserUid])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !currentUserUid) return
     window.localStorage.setItem(`${ENROLLMENT_STORAGE_PREFIX}:${currentUserUid}`, JSON.stringify(enrolledCourseIds))
   }, [currentUserUid, enrolledCourseIds])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !currentUserUid) return
+    window.localStorage.setItem(`${LMS_VIDEO_ENROLLMENT_STORAGE_PREFIX}:${currentUserUid}`, JSON.stringify(enrolledVideoIds))
+  }, [currentUserUid, enrolledVideoIds])
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
@@ -515,6 +547,7 @@ function App() {
           setCurrentUserUid(null)
           setCurrentUserRole(null)
           setEnrolledCourseIds([])
+          setEnrolledVideoIds([])
           navigate('/login', { replace: true })
         }
       }
@@ -607,6 +640,7 @@ function App() {
     setCurrentUserUid(null)
     setCurrentUserRole(null)
     setEnrolledCourseIds([])
+    setEnrolledVideoIds([])
     navigate('/', { replace: true })
   }
 
@@ -656,12 +690,30 @@ function App() {
     navigate('/url-admin', { replace: true })
   }
 
-  const handleSubjectVideoOpen = (subjectKey, videoIndex) => {
-    navigate(`/subjects/${subjectKey}/${videoIndex + 1}`)
+  const handleSubjectVideoOpen = (subjectKey, videoIndex, subcategoryKey = 'programming') => {
+    navigate(`/student/subjects/${subjectKey}/${subcategoryKey}/${videoIndex + 1}`)
   }
 
   const handleSubjectRouteNavigate = (subjectKey) => {
     navigate(`/subjects/${subjectKey}/1`)
+  }
+
+  const handleStudentSubjectRouteNavigate = (subjectKey) => {
+    navigate(`/student/subjects/${subjectKey}/programming/1`)
+  }
+
+  const handleEnrollVideo = (videoEnrollmentId) => {
+    const nextParts = String(videoEnrollmentId).split(':')
+    const nextYoutubeId = nextParts.length >= 4 ? nextParts.slice(3).join(':') : nextParts[2]
+    setEnrolledVideoIds((currentIds) => (
+      currentIds.some((currentId) => {
+        const currentParts = String(currentId).split(':')
+        const currentYoutubeId = currentParts.length >= 4 ? currentParts.slice(3).join(':') : currentParts[2]
+        return currentParts[0] === nextParts[0]
+          && currentParts[1] === nextParts[1]
+          && currentYoutubeId === nextYoutubeId
+      }) ? currentIds : [...currentIds, videoEnrollmentId]
+    ))
   }
 
   const scrollToHomeSection = (sectionId) => {
@@ -719,13 +771,22 @@ function App() {
       onOpenAbout={() => scrollToHomeSection('about-swayam')}
       onOpenCatalog={() => navigate('/course-list')}
       onOpenHelp={() => scrollToHomeSection('explore-courses')}
+      onOpenJobs={() => navigate('/jobs')}
       onOpenLocalChapters={() => scrollToHomeSection('explore-courses')}
       onOpenMyLearnings={() => {
         setStudentTab('My Learnings')
         navigate(currentUserRole === 'student' ? '/student' : '/login')
       }}
+      onOpenMyProfile={() => {
+        if (currentUserRole === 'student') {
+          setStudentTab('My Profile')
+          navigate('/student')
+          return
+        }
+        navigate('/login')
+      }}
       onLogoClick={() => navigate('/')}
-      onOpenSubject={(subjectKey = 'commerce') => navigate(`/subjects/${subjectKey}`)}
+      onOpenSubject={(subjectKey = 'computerscience') => navigate(`/subjects/${subjectKey}`)}
       showFooter={options.showFooter ?? true}
       hideFlashBanner={options.hideFlashBanner ?? false}
       centered={options.centered ?? true}
@@ -766,15 +827,34 @@ function App() {
             onAddCart={addToCart}
             onPreview={openPreview}
             onOpenCatalog={() => navigate('/course-list')}
-            onOpenSubject={(subjectKey = 'commerce') => navigate(`/subjects/${subjectKey}`)}
+            onOpenSubject={(subjectKey = 'computerscience') => navigate(`/subjects/${subjectKey}`)}
           />,
+          { centered: false },
         )}
       />
       <Route
         path="/course-list"
         element={renderMarketplace(
-          <PublicCourseList onOpenCourse={openCourse} />,
-          { centered: false },
+          <PublicCourseList
+            currentUserRole={currentUserRole}
+            enrolledVideoIds={enrolledVideoIds}
+            onRegisterVideo={(redirectTo) => navigateToAuth('signup', redirectTo)}
+            onEnrollVideo={handleEnrollVideo}
+            onOpenSubjectVideo={handleSubjectVideoOpen}
+          />,
+          { centered: false, showFooter: false },
+        )}
+      />
+      <Route
+        path="/jobs"
+        element={renderMarketplace(
+          <PublicJobsView
+            currentUserRole={currentUserRole}
+            authStateReady={authStateReady}
+            onLogin={() => navigate('/login', { state: { redirectTo: '/jobs', requiredRole: 'student' } })}
+            onRegister={() => navigate('/signup', { state: { redirectTo: '/jobs', requiredRole: 'student' } })}
+          />,
+          { centered: false, showFooter: false },
         )}
       />
       <Route
@@ -800,6 +880,7 @@ function App() {
           />,
           {
             centered: false,
+            showFooter: false,
             topbarTitleOnly: true,
             topbarTitle: findCourseBySlug(allLearnerCourses, location.pathname.split('/').pop())?.title ?? 'Course',
             showCourseActions: true,
@@ -852,6 +933,7 @@ function App() {
             onAddCart={addToCart}
             onPreview={openPreview}
           />,
+          { showFooter: false },
         )}
       />
       <Route
@@ -863,6 +945,7 @@ function App() {
             onRemoveCart={removeFromCart}
             onStartLearning={() => navigate(currentUserRole === 'student' ? '/student' : '/login')}
           />,
+          { showFooter: false },
         )}
       />
       <Route
@@ -876,6 +959,26 @@ function App() {
         )}
       />
       <Route path="/subjects/:subject" element={<SubjectRouteRedirect />} />
+      <Route
+        path="/student/subjects/:subject/:subcategory/:videoIndex"
+        element={
+          !authStateReady
+            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: false, centered: false })
+            : currentUserRole === 'student'
+            ? renderMarketplace(
+              <SubjectDetailRoute
+                onSubjectNavigate={handleStudentSubjectRouteNavigate}
+                onVideoNavigate={handleSubjectVideoOpen}
+              />,
+              { centered: false, showFooter: false, hideFlashBanner: true, hideFloatingAssistant: true },
+            )
+            : <Navigate to="/signup" replace state={{ redirectTo: location.pathname, requiredRole: 'student' }} />
+        }
+      />
+      <Route
+        path="/student/subjects/:subject"
+        element={<Navigate to={`/student/subjects/${location.pathname.split('/').pop() ?? 'computerscience'}/programming/1`} replace />}
+      />
       <Route
         path="/login"
         element={
@@ -892,7 +995,8 @@ function App() {
                 isReady={authStateReady}
               />,
               {
-                showFooter: false,
+                showFooter: true,
+                centered: false,
                 hideFloatingAssistant: true,
               },
             )
@@ -914,7 +1018,8 @@ function App() {
                 isReady={authStateReady}
               />,
               {
-                showFooter: false,
+                showFooter: true,
+                centered: false,
                 hideFloatingAssistant: true,
               },
             )
@@ -924,7 +1029,7 @@ function App() {
         path="/student"
         element={
           !authStateReady
-            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: true, centered: false })
+            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: false, centered: false })
             : currentUserRole === 'student'
             ? renderMarketplace(
             <RoleWorkspaceLayout
@@ -933,19 +1038,22 @@ function App() {
                 activeTab={studentTab}
                 onTabChange={setStudentTab}
                 fullWidth
-                singleView={studentTab === 'My Learnings'}
+                singleView={false}
               >
                 <StudentView
                   activeTab={studentTab}
                   selectedCourse={selectedCourse}
+                  currentUserUid={currentUserUid}
                   courses={allLearnerCourses}
                   enrolledCourseIds={enrolledCourseIds}
+                  enrolledVideoIds={enrolledVideoIds}
                   onVideoViewChange={setIsStudentVideoView}
                   onOpenCourseView={(course) => navigate(buildStudentCoursePath(course))}
+                  onOpenVideoView={(course) => navigate(`/student/subjects/${course.subjectKey}/${course.subcategoryKey}/${course.videoIndex + 1}`)}
                 />
               </RoleWorkspaceLayout>,
               {
-                showFooter: !isStudentVideoView,
+                showFooter: false,
                 hideFlashBanner: isStudentVideoView,
                 centered: false,
                 hideTopbar: isStudentVideoView,
@@ -959,7 +1067,7 @@ function App() {
         path="/instructor-dashboard"
         element={
           !authStateReady
-            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: true, centered: false })
+            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: false, centered: false })
             : currentUserRole === 'instructor'
             ? renderMarketplace(
               <RoleWorkspaceLayout
@@ -971,7 +1079,7 @@ function App() {
               >
                 <InstructorView activeTab={instructorTab} />
               </RoleWorkspaceLayout>,
-              { showFooter: true, centered: false },
+              { showFooter: false, centered: false },
             )
             : <Navigate to="/login" replace />
         }

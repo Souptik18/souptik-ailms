@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styles from './Topbar.module.css'
-import uilsLogo from '../../utils/pic.png'
 
 function Topbar({
   isAdminRoute,
@@ -11,7 +10,9 @@ function Topbar({
   onOpenLogin,
   onOpenAbout,
   onOpenHelp,
+  onOpenJobs,
   onOpenMyLearnings,
+  onOpenMyProfile,
   onOpenCatalog,
   adminLoggedIn,
   onBackToMarketplace,
@@ -24,7 +25,28 @@ function Topbar({
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const [showAnnouncement, setShowAnnouncement] = useState(true)
+  const topbarRef = useRef(null)
   const accountMenuRef = useRef(null)
+
+  useEffect(() => {
+    if (typeof document === 'undefined' || !topbarRef.current) return undefined
+
+    const updateTopbarHeight = () => {
+      const nextHeight = Math.ceil(topbarRef.current?.getBoundingClientRect().height ?? 0)
+      document.documentElement.style.setProperty('--topbar-height', `${nextHeight}px`)
+    }
+
+    updateTopbarHeight()
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(updateTopbarHeight)
+    resizeObserver?.observe(topbarRef.current)
+    window.addEventListener('resize', updateTopbarHeight)
+
+    return () => {
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', updateTopbarHeight)
+      document.documentElement.style.removeProperty('--topbar-height')
+    }
+  }, [])
 
   useEffect(() => {
     if (!accountMenuOpen) return undefined
@@ -50,27 +72,21 @@ function Topbar({
   }, [accountMenuOpen])
 
   const accountInitial = currentUserRole ? currentUserRole.charAt(0).toUpperCase() : 'U'
-  const alertMessage = 'Call us: +91 92373 96048'
-  const openKiitExtensionSchoolSite = () => {
-    if (typeof window !== 'undefined') {
-      window.open('https://kiitx.kiit.ac.in', '_blank', 'noopener,noreferrer')
-    }
-  }
-  const openSwayamSite = () => {
+  const alertMessage = 'New guided programs are open for enrollment'
+  const openOpenLearningSite = () => {
     if (typeof window !== 'undefined') {
       window.open('https://swayam.gov.in', '_blank', 'noopener,noreferrer')
     }
   }
   const primaryLinks = [
-    { label: 'About KIITX', action: onOpenAbout },
     { label: 'All Courses', action: onOpenCatalog },
+    { label: 'Jobs', action: onOpenJobs },
     { label: 'FAQ', action: onOpenHelp },
-    { label: 'Kiit Extension School', action: openKiitExtensionSchoolSite },
-    { label: 'Swayam', action: openSwayamSite },
+    { label: 'Open Learning', action: openOpenLearningSite },
   ]
 
   return (
-    <header className={styles.topbar}>
+    <header className={styles.topbar} ref={topbarRef}>
       {!isAdminRoute && (
         <>
           {showAnnouncement && !hideFlashBanner && (
@@ -79,7 +95,6 @@ function Topbar({
                 <div className={styles.alertTicker} aria-label={alertMessage}>
                   <div className={styles.alertTrack}>
                     <span className={styles.alertMessage}>{alertMessage}</span>
-                    <span className={styles.alertMessage} aria-hidden="true">{alertMessage}</span>
                   </div>
                 </div>
                 <button
@@ -96,7 +111,8 @@ function Topbar({
           <div className={styles.marketNav}>
             <div className={styles.marketNavLeft}>
               <Link className={styles.logo} to="/" aria-label="Go to homepage" title="Go to homepage">
-                <img src={uilsLogo} alt="KIITX logo" />
+                <span className={styles.logoGlyph}>OC</span>
+                <span className={styles.logoText}>OpenCourse</span>
               </Link>
               {titleOnly ? (
                 <h1 className={styles.navTitle}>{titleText}</h1>
@@ -105,15 +121,18 @@ function Topbar({
             {titleOnly ? (
               <div className={`${styles.marketNavCenter} ${styles.titleCenter}`} aria-hidden="true" />
             ) : (
-              <nav className={`${styles.primaryNav} ${styles.topLineNav} ${styles.marketNavCenter}`} aria-label="Primary">
-                {primaryLinks.map((item) => (
-                  <button key={item.label} type="button" onClick={item.action}>
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
+              <div className={`${styles.marketNavCenter} ${styles.titleCenter}`} aria-hidden="true" />
             )}
             <div className={styles.marketNavRight}>
+              {!titleOnly ? (
+                <nav className={`${styles.primaryNav} ${styles.topLineNav}`} aria-label="Primary">
+                  {primaryLinks.map((item) => (
+                    <button key={item.label} type="button" onClick={item.action}>
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+              ) : null}
               {!authStateReady ? (
                 <span className={styles.authPlaceholder} aria-hidden="true" />
               ) : currentUserRole ? (
@@ -149,19 +168,17 @@ function Topbar({
                     {accountMenuOpen && (
                       <div className={styles.accountMenu} role="menu">
                         <p className={styles.accountMeta}>Signed in as {currentUserRole}</p>
-                        {currentUserRole === 'student' ? (
-                          <button
-                            className={styles.accountAction}
-                            type="button"
-                            role="menuitem"
-                            onClick={() => {
-                              setAccountMenuOpen(false)
-                              onOpenMyLearnings()
-                            }}
-                          >
-                            My Learnings
-                          </button>
-                        ) : null}
+                        <button
+                          className={styles.accountAction}
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setAccountMenuOpen(false)
+                            onOpenMyProfile?.()
+                          }}
+                        >
+                          My Profile
+                        </button>
                         <button
                           className={styles.accountAction}
                           type="button"
