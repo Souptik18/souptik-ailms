@@ -110,7 +110,6 @@ function PublicSubjectView({
   initialSubcategory: initialSubcategoryProp,
   initialVideoIndex = 0,
   mode = 'detail',
-  onSubjectNavigate,
   onVideoOpen,
   currentUserRole,
   enrolledVideoIds = [],
@@ -266,12 +265,6 @@ function PublicSubjectView({
     observer.observe(loadMoreRef.current)
     return () => observer.disconnect()
   }, [activeFilterKey, activeSubject, activeSubcategory, hasMoreVideos, isLoadingMoreVideos, mode, nextPageToken, previewVideo, visibleVideoCount, videos.length])
-
-  const handleSubjectChange = (subjectKey) => {
-    if (typeof onSubjectNavigate === 'function') {
-      onSubjectNavigate(subjectKey)
-    }
-  }
 
   const isSectionOpen = (tabKey, sectionId) => openSectionByTab[tabKey] === sectionId
 

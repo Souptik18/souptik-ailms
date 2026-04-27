@@ -8,7 +8,6 @@ function Topbar({
   authStateReady,
   onLogout,
   onOpenLogin,
-  onOpenAbout,
   onOpenHelp,
   onOpenJobs,
   onOpenMyLearnings,

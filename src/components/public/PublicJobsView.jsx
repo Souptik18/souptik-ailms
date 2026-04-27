@@ -109,7 +109,7 @@ async function fetchJobs() {
 
 function PublicJobsView({ currentUserRole, authStateReady, onLogin, onRegister }) {
   const [jobs, setJobs] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [query, setQuery] = useState('')
   const [regionFilter, setRegionFilter] = useState('All')
@@ -120,8 +120,6 @@ function PublicJobsView({ currentUserRole, authStateReady, onLogin, onRegister }
     if (!canFetchJobs) return undefined
 
     let active = true
-    setIsLoading(true)
-    setErrorMessage('')
 
     fetchJobs()
       .then((nextJobs) => {
