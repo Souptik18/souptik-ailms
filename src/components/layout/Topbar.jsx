@@ -132,9 +132,7 @@ function Topbar({
                   ))}
                 </nav>
               ) : null}
-              {!authStateReady ? (
-                <span className={styles.authPlaceholder} aria-hidden="true" />
-              ) : currentUserRole ? (
+              {authStateReady && currentUserRole ? (
                 <>
                   {showCourseActions ? (
                     <>
@@ -205,8 +203,22 @@ function Topbar({
                       </button>
                     </>
                   ) : null}
-                  <button className={`btn-outline ${styles.navBtn}`} type="button" onClick={() => onOpenLogin('login')}>Log in</button>
-                  <button className={`btn-primary ${styles.navBtn}`} type="button" onClick={() => onOpenLogin('signup')}>Sign up</button>
+                  <button
+                    className={`btn-outline ${styles.navBtn}`}
+                    type="button"
+                    onClick={() => onOpenLogin('login')}
+                    disabled={!authStateReady}
+                  >
+                    Log in
+                  </button>
+                  <button
+                    className={`btn-primary ${styles.navBtn}`}
+                    type="button"
+                    onClick={() => onOpenLogin('signup')}
+                    disabled={!authStateReady}
+                  >
+                    Sign up
+                  </button>
                 </>
               )}
             </div>
