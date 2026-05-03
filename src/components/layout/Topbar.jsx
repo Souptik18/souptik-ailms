@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Moon, Sun } from 'lucide-react'
 import styles from './Topbar.module.css'
 
 function Topbar({
@@ -12,6 +13,7 @@ function Topbar({
   onOpenJobs,
   onOpenMyLearnings,
   onOpenMyProfile,
+  onOpenStudentWorkspace,
   onOpenCatalog,
   adminLoggedIn,
   onBackToMarketplace,
@@ -21,6 +23,9 @@ function Topbar({
   showCourseActions = false,
   onLeaveReview,
   onShareCourse,
+  showVideoThemeToggle = false,
+  videoThemeMode = 'light',
+  onToggleVideoTheme,
 }) {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const [showAnnouncement, setShowAnnouncement] = useState(true)
@@ -123,6 +128,17 @@ function Topbar({
               <div className={`${styles.marketNavCenter} ${styles.titleCenter}`} aria-hidden="true" />
             )}
             <div className={styles.marketNavRight}>
+              {showVideoThemeToggle ? (
+                <button
+                  type="button"
+                  className={styles.navThemeToggle}
+                  onClick={onToggleVideoTheme}
+                  title={videoThemeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                  aria-label={videoThemeMode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                  {videoThemeMode === 'dark' ? <Sun size={15} strokeWidth={2.3} /> : <Moon size={15} strokeWidth={2.3} />}
+                </button>
+              ) : null}
               {!titleOnly ? (
                 <nav className={`${styles.primaryNav} ${styles.topLineNav}`} aria-label="Primary">
                   {primaryLinks.map((item) => (
@@ -171,10 +187,10 @@ function Topbar({
                           role="menuitem"
                           onClick={() => {
                             setAccountMenuOpen(false)
-                            onOpenMyProfile?.()
+                            onOpenStudentWorkspace?.()
                           }}
                         >
-                          My Profile
+                          Student Workspace
                         </button>
                         <button
                           className={styles.accountAction}
@@ -207,7 +223,6 @@ function Topbar({
                     className={`btn-outline ${styles.navBtn}`}
                     type="button"
                     onClick={() => onOpenLogin('login')}
-                    disabled={!authStateReady}
                   >
                     Log in
                   </button>
@@ -215,7 +230,6 @@ function Topbar({
                     className={`btn-primary ${styles.navBtn}`}
                     type="button"
                     onClick={() => onOpenLogin('signup')}
-                    disabled={!authStateReady}
                   >
                     Sign up
                   </button>

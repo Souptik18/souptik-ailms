@@ -376,6 +376,11 @@ async function readAuthSession(env, request) {
   if (!sessionToken) return null
   const session = await parseSessionToken(env, sessionToken)
   if (!isSessionValid(session, request)) return null
+  const kv = getKv(env)
+  if (kv && session.uid && session.sid) {
+    const activeSid = await kv.get(toActiveSessionKey(session.uid))
+    if (!activeSid || activeSid !== session.sid) return null
+  }
   return session
 }
 
@@ -395,6 +400,10 @@ async function verifyFirebaseIdToken(env, idToken) {
 
 function getKv(env) {
   return env.KIITX_STATE || null
+}
+
+function toActiveSessionKey(uid) {
+  return `active-session:${uid}`
 }
 
 async function kvGetJson(env, key, fallback = null) {
@@ -748,10 +757,20 @@ async function handleRequest(request, env) {
     const user = await verifyFirebaseIdToken(env, idToken)
     if (!user.uid) return json({ error: 'Unable to resolve user from token.' }, 401, cors)
     const now = Date.now()
+    const sid = crypto.randomUUID()
+    const kv = getKv(env)
+    if (kv) {
+      await kv.put(
+        toActiveSessionKey(user.uid),
+        sid,
+        { expirationTtl: Math.ceil(SESSION_ABSOLUTE_LIMIT_MS / 1000) },
+      )
+    }
     const payload = {
       uid: user.uid,
       email: user.email,
       role,
+      sid,
       fingerprint: fingerprintValue(request),
       createdAtMs: now,
       rotatedAtMs: now,
@@ -800,6 +819,14 @@ async function handleRequest(request, env) {
   }
 
   if (pathname === '/api/session/logout' && request.method === 'POST') {
+    const session = await readAuthSession(env, request)
+    const kv = getKv(env)
+    if (kv && session?.uid && session?.sid) {
+      const activeSid = await kv.get(toActiveSessionKey(session.uid))
+      if (activeSid === session.sid) {
+        await kv.delete(toActiveSessionKey(session.uid))
+      }
+    }
     return json({ ok: true }, 200, { ...cors, 'Set-Cookie': buildClearCookie({ secure: true }) })
   }
 

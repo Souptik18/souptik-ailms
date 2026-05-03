@@ -1,73 +1,165 @@
-# KIITX NPTEL
+# Souptik AILMS
 
-This project now uses a server-backed authentication session instead of trusting client-side `localStorage` for login state.
+Souptik AILMS is a full-stack learning platform for public course discovery, student enrollment, LMS video learning, student analytics, secure authentication, and role-based workspace access.
+
+## Hosted Project
+
+https://souptik-ailms.vercel.app
+
+## Repository
+
+https://github.com/Souptik18/souptik-ailms
+
+## What It Does
+
+- Public course marketplace with course previews and instructor detail pages.
+- Student and instructor authentication with secure server-controlled sessions.
+- Student workspace at `/student/student-workspace`.
+- My Learnings page at `/student/my-learnings` for continuing enrolled courses and videos.
+- LMS subject viewer with videos, documents, PPT resources, and tutor assistance.
+- Admin console isolated under `/url-admin`.
+- Role-aware routing for public, student, instructor, and admin flows.
+- Cloudflare Worker backend support for API, sessions, LMS videos, feedback, and tutor endpoints.
+
+## Stack
+
+- React 19
+- Vite 7
+- React Router
+- Firebase Authentication
+- Firebase Admin verification
+- Cloudflare Workers
+- Cloudflare KV
+- Groq chat completions with `llama-3.3-70b-versatile`
+- Recharts
+- Radix UI
+- Lucide React
+- Tailwind CSS tooling
 
 ## Architecture
 
-- Frontend sign-in still uses Firebase Authentication to obtain an ID token.
-- Backend verifies the Firebase ID token with `firebase-admin`.
-- Backend issues a secure `HttpOnly` session cookie.
-- Session state and last activity are stored in Firestore.
-- Sessions expire after 5 hours of inactivity on the server.
+The frontend uses Firebase Authentication to obtain an identity token. The backend verifies that token, creates a secure session, and keeps session authority outside browser-controlled state.
 
-## Required server environment
+The Cloudflare Worker backend provides:
 
-Copy `.env.server.example` into your runtime environment and set:
+- `GET /api/health`
+- `GET /api/lms-videos`
+- `POST /api/session/login`
+- `GET /api/session/me`
+- `POST /api/session/heartbeat`
+- `POST /api/session/logout`
+- `GET /api/courses/:courseId/feedback`
+- `POST /api/courses/:courseId/feedback`
+- `POST /api/tutor/video-chat`
+- `GET /api/tutor/history/:videoId`
+- `PUT /api/tutor/history/:videoId`
 
-- `FIREBASE_PROJECT_ID`
-- `FIREBASE_CLIENT_EMAIL`
-- `FIREBASE_PRIVATE_KEY`
-- `APP_ORIGIN`
+## Main Routes
 
-Instead of env vars, the server can also read a local service account file from:
+- `/` - homepage and public marketplace.
+- `/course-list` - LMS and course catalog.
+- `/course/:courseSlug` - public course detail page.
+- `/student/student-workspace` - student workspace.
+- `/student/student-workspace/:workspaceTab` - routed student workspace tabs.
+- `/student/my-learnings` - enrolled learning page.
+- `/student/course/:courseSlug` - enrolled catalog course viewer.
+- `/student/subjects/:subject/:subcategory/:videoIndex` - enrolled LMS video viewer.
+- `/subjects/:subject/:videoIndex` - public subject preview route.
+- `/jobs` - public jobs feed.
+- `/login` - login page.
+- `/signup` - signup page.
+- `/url-admin` - admin login.
+- `/url-admin/dashboard` - admin dashboard.
+- `/url-admin/courses` - admin courses.
+- `/url-admin/students` - admin students.
+- `/url-admin/analytics` - admin analytics.
+- `/url-admin/settings` - admin settings.
 
-```text
-serviceAccountKey.json
-```
+## Local Setup
 
-in the project root. That file is gitignored.
-
-## Run locally
-
-Start the auth server:
+Install dependencies:
 
 ```bash
-npm run server
+npm install
 ```
 
-Start the Vite client in a second terminal:
+Run the frontend:
 
 ```bash
 npm run dev
 ```
 
-The Vite dev server proxies `/api/*` requests to `http://localhost:4001`.
+Run the Cloudflare Worker locally:
 
-## Vercel + Render deploy
+```bash
+npm run cf:dev
+```
 
-Frontend (Vercel):
+Build the frontend:
 
-- Deploy this repo on Vercel.
-- Set `VITE_API_BASE_URL` to your Render backend URL (for example `https://kiitx-session-api.onrender.com`).
-- Redeploy Vercel after setting environment variables.
+```bash
+npm run build
+```
 
-Backend (Render):
+## Environment
 
-- Use the included `render.yaml` Blueprint.
-- Create a Render web service from this repo.
-- Set these required environment variables in Render:
-  - `APP_ORIGIN` = your Vercel domain (or comma-separated list for multiple frontend origins)
-  - `FIREBASE_PROJECT_ID`
-  - `FIREBASE_CLIENT_EMAIL`
-  - `FIREBASE_PRIVATE_KEY`
-- Keep `NODE_ENV=production` and `SESSION_COOKIE_SAME_SITE=none` so cross-domain cookies work.
+Set these values for the Cloudflare Worker runtime:
 
-## Security notes
+```text
+APP_ORIGIN=https://souptik-ailms.vercel.app
+FIREBASE_PROJECT_ID=
+SESSION_COOKIE_SECRET=
+YOUTUBE_API_KEY=
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.3-70b-versatile
+```
 
-- The login session is no longer stored in `localStorage`.
-- The server is now the source of truth for session validity.
-- Role assignment is stored in Firestore and enforced by the server.
-- Sessions are bound to a request fingerprint and invalidated on mismatch.
-- Sessions expire after 5 hours of inactivity and 12 hours absolute lifetime.
-- Session IDs rotate during use to reduce replay value if one is stolen.
-- The existing learner enrollment demo data still uses browser storage and has not been migrated to Firestore yet.
+Set the frontend API base to the Cloudflare Worker endpoint:
+
+```text
+VITE_API_BASE_URL=https://<cloudflare-worker-domain>
+```
+
+## Cloudflare
+
+Worker entry:
+
+```text
+cloudflare/worker.js
+```
+
+Wrangler config:
+
+```text
+wrangler.toml
+```
+
+Required KV binding:
+
+```text
+KIITX_STATE
+```
+
+Deploy Worker:
+
+```bash
+npm run cf:deploy
+```
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run cf:dev
+npm run cf:deploy
+```
+
+## Security Notes
+
+- Login state is not treated as trusted just because it exists in the browser.
+- Server-side session validation controls authenticated access.
+- Session heartbeat keeps active users valid and expires inactive sessions.
+- Student, instructor, and admin routes are separated.
+- Admin access is intentionally available only from `/url-admin`.

@@ -136,7 +136,7 @@ export const certificationTracks = [
 export const trustedBy = ['Nasdaq', 'Volkswagen', 'NetApp', 'Eventbrite']
 
 export const workspaceMenu = {
-  student: ['My Learnings', 'Wishlist', 'Certificates', 'My Profile', 'Settings'],
+  student: ['Student Report', 'Wishlist', 'Certificates', 'My Profile', 'Settings'],
   instructor: ['Overview', 'Course Manager', 'Curriculum Preview', 'Revenue'],
   admin: ['Homepage', 'Users', 'Moderation', 'Reports', 'Settings'],
 }

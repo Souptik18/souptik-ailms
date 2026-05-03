@@ -117,6 +117,7 @@ function PublicSubjectView({
   onEnrollVideo,
   overlayMode = false,
   onTitleChange,
+  themeMode = 'dark',
 }) {
   const activeSubject = normalizeSubject(initialSubject)
   const initialSubcategory = initialSubcategoryProp
@@ -158,6 +159,21 @@ function PublicSubjectView({
   const tutorMessagesRef = useRef(null)
   const tutorHistoryCacheRef = useRef(new Map())
   const loadMoreRef = useRef(null)
+  const resolvedThemeMode = themeMode === 'light' ? 'light' : 'dark'
+  const isDarkTheme = resolvedThemeMode === 'dark'
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined
+    if (!isDetailMode) {
+      document.body.removeAttribute('data-video-theme')
+      return undefined
+    }
+
+    document.body.setAttribute('data-video-theme', resolvedThemeMode)
+    return () => {
+      document.body.removeAttribute('data-video-theme')
+    }
+  }, [isDetailMode, resolvedThemeMode])
 
   useEffect(() => {
     setActiveSubcategory(initialSubcategory)
@@ -533,7 +549,7 @@ function PublicSubjectView({
   )
 
   return (
-    <section className={`${styles.subjectLayout} ${overlayMode ? styles.overlayMode : ''} ${isDetailMode ? styles.detailMode : ''} ${isLeftPanelCollapsed ? styles.leftCollapsed : ''}`}>
+    <section className={`${styles.subjectLayout} ${overlayMode ? styles.overlayMode : ''} ${isDetailMode ? styles.detailMode : ''} ${isLeftPanelCollapsed ? styles.leftCollapsed : ''} ${isDetailMode && isDarkTheme ? styles.themeDark : ''}`}>
       {!isLeftPanelCollapsed ? (
         <aside className={styles.sidebar}>
           {isDetailMode ? (

@@ -10,6 +10,203 @@
   position: relative;
 }
 
+.themeDark {
+  background:
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 38%),
+    linear-gradient(180deg, #070d19 0%, #0d1628 100%);
+  color: #e2e8f0;
+}
+
+.themeDark .sidebar,
+.themeDark .content,
+.themeDark .playerPanel,
+.themeDark .resourcePanel,
+.themeDark .detailMode .playerPanel,
+.themeDark .detailMode .resourcePanel,
+.themeDark .detailMode .sidebar,
+.themeDark .resourceTabs,
+.themeDark .resourceBody,
+.themeDark .tutorPanel,
+.themeDark .tutorComposer input {
+  background: #0f1a30;
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #e2e8f0;
+}
+
+.themeDark .cardMeta span,
+.themeDark .cardMeta small,
+.themeDark .previewDetails p,
+.themeDark .previewDetails h2,
+.themeDark .previewDetails span,
+.themeDark .previewContentList h3,
+.themeDark .previewContentList article span,
+.themeDark .previewMetaGrid span,
+.themeDark .previewMetaGrid strong,
+.themeDark .resourceBody,
+.themeDark .tutorTranscript p,
+.themeDark .tutorTranscript h4,
+.themeDark .sidebar h2,
+.themeDark .subcategoryStack h3,
+.themeDark .sectionToggleMeta strong,
+.themeDark .sectionToggleMeta span,
+.themeDark .topicRows > button span,
+.themeDark .topicRows > button small,
+.themeDark .assetRow span {
+  color: #e2e8f0;
+}
+
+.themeDark .subjectStack button,
+.themeDark .subcategoryStack button,
+.themeDark .subjectPills button,
+.themeDark .panelToggleBtn,
+.themeDark .closeBtn,
+.themeDark .playerControlBtn,
+.themeDark .resourceTabAction,
+.themeDark .resourceTabs button,
+.themeDark .tutorComposer button,
+.themeDark .filterChips button,
+.themeDark .tutorHistoryBtn,
+.themeDark .edgeToggleBtn,
+.themeDark .assetTag {
+  background: #111c31;
+  border-color: rgba(148, 163, 184, 0.34);
+  color: #e2e8f0;
+}
+
+.themeDark .subjectStack button:hover,
+.themeDark .subcategoryStack button:hover,
+.themeDark .subjectPills button:hover,
+.themeDark .panelToggleBtn:hover,
+.themeDark .closeBtn:hover,
+.themeDark .playerControlBtn:hover,
+.themeDark .resourceTabAction:hover,
+.themeDark .resourceTabs button:hover,
+.themeDark .tutorComposer button:hover,
+.themeDark .filterChips button:hover,
+.themeDark .tutorHistoryBtn:hover,
+.themeDark .edgeToggleBtn:hover,
+.themeDark .assetTag:hover {
+  background: #17253d;
+}
+
+.themeDark .subjectStack button.subjectActive,
+.themeDark .subcategoryStack button.subjectActive,
+.themeDark .subjectPills button.subjectPillActive,
+.themeDark .filterChipActive,
+.themeDark .resourceTabActive {
+  background: linear-gradient(135deg, #155e75 0%, #0f172a 100%);
+  border-color: rgba(56, 189, 248, 0.6);
+  color: #ccfbf1;
+}
+
+.themeDark .sectionCard {
+  border-color: rgba(148, 163, 184, 0.26);
+  background: #101c34;
+}
+
+.themeDark .sectionToggle {
+  background: #13213d;
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+.themeDark .sectionToggle:hover {
+  background: #1a2c4f;
+}
+
+.themeDark .topicRows > button,
+.themeDark .assetRow {
+  background: #0f1a30;
+  border-top-color: rgba(148, 163, 184, 0.16);
+}
+
+.themeDark .topicRows > button:hover {
+  background: #152643;
+}
+
+.themeDark .topicRows > button.topicRowActive {
+  background: linear-gradient(135deg, #0f2c4f 0%, #13213d 100%);
+}
+
+.themeDark .resourceMediaFrame,
+.themeDark .resourceFrame {
+  background: #0b1324;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+.themeDark .viewerFallback,
+.themeDark .sectionChevron {
+  color: #cbd5e1;
+}
+
+.themeDark .tutorTranscript,
+.themeDark .tutorBotBubble {
+  background: #101d35;
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #e2e8f0;
+}
+
+.themeDark .tutorUserBubble {
+  background: #0e7490;
+  border-color: #0e7490;
+}
+
+.themeDark .playerPanel :global(.video-frame) {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.themeDark.detailMode {
+  background:
+    radial-gradient(circle at 82% 8%, rgba(56, 189, 248, 0.14), transparent 34%),
+    radial-gradient(circle at 8% 92%, rgba(14, 116, 144, 0.16), transparent 36%),
+    linear-gradient(180deg, #070d19 0%, #0b1324 100%);
+}
+
+.themeDark.detailMode .content {
+  background: #0c1426;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+.themeDark.detailMode .watchRow {
+  background: transparent;
+}
+
+.themeDark.detailMode .sidebar {
+  background: linear-gradient(180deg, #101a31 0%, #0c1426 100%);
+  border-color: rgba(148, 163, 184, 0.26);
+}
+
+.themeDark.detailMode .playerPanel {
+  background: #0f1a30;
+  border-color: rgba(148, 163, 184, 0.26);
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.55);
+}
+
+.themeDark.detailMode .resourcePanel {
+  background: #0f1a30;
+  border-color: rgba(148, 163, 184, 0.26);
+  box-shadow: 0 16px 34px rgba(2, 6, 23, 0.48);
+}
+
+.themeDark.detailMode .resourceTabs {
+  background: #101d35;
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+.themeDark.detailMode .tutorChat,
+.themeDark.detailMode .tutorComposer {
+  border-top-color: rgba(148, 163, 184, 0.2);
+}
+
+.themeDark.detailMode .playerControlBtn {
+  background: #16253f;
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+}
+
+.themeDark.detailMode .playerControlBtn:hover {
+  background: #1b2d4a;
+}
+
 .overlayMode {
   min-height: 100%;
   height: 100%;

@@ -278,6 +278,26 @@
   min-width: 84px;
 }
 
+.navThemeToggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(31, 122, 85, 0.22);
+  background: #ffffff;
+  color: var(--brand-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.navThemeToggle:hover {
+  background: #eef8f2;
+  border-color: rgba(31, 122, 85, 0.35);
+  transform: translateY(-1px);
+}
+
 .authPlaceholder {
   min-height: 40px;
   width: 170px;
@@ -376,6 +396,102 @@
 .accountAction:hover {
   background: var(--brand-soft);
   color: var(--brand-dark);
+}
+
+:global(body[data-video-theme='dark']) .topbar {
+  background: rgba(7, 13, 25, 0.94);
+  border-bottom-color: rgba(148, 163, 184, 0.24);
+  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.55);
+}
+
+:global(body[data-video-theme='dark']) .marketNav {
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .logo {
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .logoGlyph {
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+:global(body[data-video-theme='dark']) .navTitle {
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .primaryNav button,
+:global(body[data-video-theme='dark']) .plainLink {
+  color: #dbe7ff;
+}
+
+:global(body[data-video-theme='dark']) .primaryNav button:hover,
+:global(body[data-video-theme='dark']) .plainLink:hover {
+  background: #14233f;
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .learningLink {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: linear-gradient(135deg, #10233f 0%, #0f1a30 100%);
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .learningLink:hover {
+  border-color: rgba(56, 189, 248, 0.48);
+  background: #173054;
+}
+
+:global(body[data-video-theme='dark']) .courseActionButton {
+  border-color: rgba(148, 163, 184, 0.34);
+  background: #10233f;
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .courseActionButtonPrimary {
+  border-color: rgba(56, 189, 248, 0.42);
+  background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .avatarButton {
+  border-color: rgba(148, 163, 184, 0.32);
+  background: linear-gradient(135deg, #0e7490 0%, #155e75 100%);
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .accountMenu {
+  border-color: rgba(148, 163, 184, 0.28);
+  background: #0f1a30;
+  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.55);
+}
+
+:global(body[data-video-theme='dark']) .accountMeta {
+  color: #cbd5e1;
+  border-bottom-color: rgba(148, 163, 184, 0.24);
+}
+
+:global(body[data-video-theme='dark']) .accountAction {
+  background: #0f1a30;
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .accountAction:hover {
+  background: #172a48;
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .navThemeToggle {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: #10233f;
+  color: #e2e8f0;
+}
+
+:global(body[data-video-theme='dark']) .navThemeToggle:hover {
+  border-color: rgba(56, 189, 248, 0.52);
+  background: #173054;
 }
 
 @media (max-width: 1220px) {

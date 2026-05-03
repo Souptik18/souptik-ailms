@@ -40,6 +40,8 @@ function StudentView({
   enrolledCourseIds,
   enrolledVideoIds = [],
   onVideoViewChange,
+  onOpenCourseView,
+  onOpenVideoView,
 }) {
   const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(true)
   const [jobsAlertsEnabled, setJobsAlertsEnabled] = useState(true)
@@ -48,7 +50,8 @@ function StudentView({
   const [exportMessage, setExportMessage] = useState('')
   const analyticsRef = useRef(null)
 
-  const isDashboardTab = activeTab === 'My Learnings'
+  const isReportTab = activeTab === 'Student Report'
+  const isMyLearningsTab = activeTab === 'My Learnings'
   const isWishlistTab = activeTab === 'Wishlist'
   const isCertificatesTab = activeTab === 'Certificates'
   const isProfileTab = activeTab === 'My Profile'
@@ -72,9 +75,14 @@ function StudentView({
 
       return {
         id: enrollmentId,
+        type: 'video',
+        subjectKey,
+        subcategoryKey,
+        videoIndex: hasStoredIndex ? Number.parseInt(parts[2], 10) || 0 : 0,
         title: video?.title ?? subcategory.label,
         category: subcategory.label,
         hours: video?.durationSeconds ? Math.max(1, Math.round(video.durationSeconds / 3600)) : 1,
+        thumbnail: video?.youtubeId ? `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` : null,
       }
     }).filter(Boolean),
     [enrolledVideoIds],
@@ -83,9 +91,12 @@ function StudentView({
   const allEnrolledLearning = useMemo(
     () => [...enrolledVideoCourses, ...enrolledCourses.map((course) => ({
       id: course.id,
+      type: 'course',
       title: course.title,
       category: course.category,
       hours: Number.parseFloat(String(course.hours ?? '').replace(/[^\d.]/g, '')) || 1,
+      thumbnail: course.youtubeId ? `https://img.youtube.com/vi/${course.youtubeId}/hqdefault.jpg` : null,
+      source: course,
     }))],
     [enrolledCourses, enrolledVideoCourses],
   )
@@ -198,6 +209,15 @@ function StudentView({
     onVideoViewChange?.(false)
   }, [onVideoViewChange])
 
+  const openLearningItem = (course) => {
+    if (course.type === 'video') {
+      onOpenVideoView?.(course)
+      return
+    }
+
+    onOpenCourseView?.(course.source ?? course)
+  }
+
   const exportAnalytics = async (format) => {
     if (!analyticsRef.current || exportBusy) return
     setExportBusy(true)
@@ -232,7 +252,7 @@ function StudentView({
 
   return (
     <div className={styles.studentShell}>
-      {isDashboardTab ? (
+      {isReportTab ? (
         <section className={styles.studentAnalytics} ref={analyticsRef}>
           <header className={styles.analyticsHeader}>
             <div>
@@ -324,6 +344,36 @@ function StudentView({
               </div>
             </article>
           </div>
+        </section>
+      ) : null}
+
+      {isMyLearningsTab ? (
+        <section className={styles.learningCards}>
+          {allEnrolledLearning.length > 0 ? (
+            allEnrolledLearning.map((course) => (
+              <button key={course.id} type="button" className={styles.learningCard} onClick={() => openLearningItem(course)}>
+                <div className={styles.cardThumb}>
+                  <img
+                    src={course.thumbnail || 'https://images.pexels.com/photos/5212339/pexels-photo-5212339.jpeg?auto=compress&cs=tinysrgb&w=800'}
+                    alt={course.title}
+                    loading="lazy"
+                  />
+                </div>
+                <div className={styles.learningMeta}>
+                  <span>Enrolled</span>
+                  <strong>{course.category}</strong>
+                </div>
+                <span className={styles.videoTutorBadge}>Video Tutor</span>
+                <h3>{course.title}</h3>
+                <p>Continue only your enrolled courses from this workspace.</p>
+              </button>
+            ))
+          ) : (
+            <article className={styles.emptyStateCard}>
+              <h3>No enrolled courses yet</h3>
+              <p>Enroll in a course to see it here in My Learnings.</p>
+            </article>
+          )}
         </section>
       ) : null}
 

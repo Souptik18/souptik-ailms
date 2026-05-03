@@ -39,6 +39,18 @@ import {
 const ENROLLMENT_STORAGE_PREFIX = 'kiitx-enrollments'
 const LMS_VIDEO_ENROLLMENT_STORAGE_PREFIX = 'kiitx-video-enrollments'
 const HEARTBEAT_INTERVAL_MS = 60 * 1000
+const STUDENT_WORKSPACE_PATH = '/student/student-workspace'
+const STUDENT_MY_LEARNINGS_PATH = '/student/my-learnings'
+const STUDENT_WORKSPACE_TAB_SEGMENTS = {
+  'student-report': 'Student Report',
+  wishlist: 'Wishlist',
+  certificates: 'Certificates',
+  'my-profile': 'My Profile',
+  settings: 'Settings',
+}
+const STUDENT_WORKSPACE_SEGMENT_BY_TAB = Object.fromEntries(
+  Object.entries(STUDENT_WORKSPACE_TAB_SEGMENTS).map(([segment, tab]) => [tab, segment]),
+)
 const SUBJECT_BY_CATEGORY = {
   Development: 'computerscience',
   'Data Science': 'computerscience',
@@ -75,9 +87,14 @@ function findCourseBySlug(courseCollection, courseSlug) {
 }
 
 function roleHomePath(role) {
-  if (role === 'student') return '/student'
+  if (role === 'student') return STUDENT_WORKSPACE_PATH
   if (role === 'instructor') return '/instructor-dashboard'
   return '/'
+}
+
+function buildStudentWorkspacePath(tab = 'Student Report') {
+  const segment = STUDENT_WORKSPACE_SEGMENT_BY_TAB[tab] ?? STUDENT_WORKSPACE_SEGMENT_BY_TAB['Student Report']
+  return `${STUDENT_WORKSPACE_PATH}/${segment}`
 }
 
 function getAuthMessage(error) {
@@ -166,6 +183,7 @@ function MarketplaceFrame({
   onOpenLocalChapters,
   onOpenMyLearnings,
   onOpenMyProfile,
+  onOpenStudentWorkspace,
   onLogoClick,
   onOpenSubject,
   showFooter = true,
@@ -184,6 +202,9 @@ function MarketplaceFrame({
   onLeaveReview,
   onShareCourse,
   hideFloatingAssistant = false,
+  showVideoThemeToggle = false,
+  videoThemeMode = 'light',
+  onToggleVideoTheme,
 }) {
   return (
     <>
@@ -201,6 +222,7 @@ function MarketplaceFrame({
           onOpenLocalChapters={onOpenLocalChapters}
           onOpenMyLearnings={onOpenMyLearnings}
           onOpenMyProfile={onOpenMyProfile}
+          onOpenStudentWorkspace={onOpenStudentWorkspace}
           adminLoggedIn={false}
           onBackToMarketplace={onLogoClick}
           onLogoClick={onLogoClick}
@@ -211,6 +233,9 @@ function MarketplaceFrame({
           showCourseActions={showCourseActions}
           onLeaveReview={onLeaveReview}
           onShareCourse={onShareCourse}
+          showVideoThemeToggle={showVideoThemeToggle}
+          videoThemeMode={videoThemeMode}
+          onToggleVideoTheme={onToggleVideoTheme}
         />
       ) : null}
       <div className={`public-shell ${centered ? 'public-shell-center' : ''}`}>{children}</div>
@@ -270,7 +295,14 @@ function CourseRoute({
   )
 }
 
-function StudentCourseRoute({ courseCollection, enrolledCourseIds, onVideoViewChange, onLogout, onTitleChange }) {
+function StudentCourseRoute({
+  courseCollection,
+  enrolledCourseIds,
+  onVideoViewChange,
+  onLogout,
+  onTitleChange,
+  videoThemeMode,
+}) {
   const navigate = useNavigate()
   const { courseSlug } = useParams()
   const course = findCourseBySlug(courseCollection, courseSlug ?? '')
@@ -281,7 +313,7 @@ function StudentCourseRoute({ courseCollection, enrolledCourseIds, onVideoViewCh
   }, [onVideoViewChange])
 
   if (!course || !enrolledCourseIds.includes(course.id)) {
-    return <Navigate to="/student" replace />
+    return <Navigate to={STUDENT_MY_LEARNINGS_PATH} replace />
   }
 
   return (
@@ -295,10 +327,11 @@ function StudentCourseRoute({ courseCollection, enrolledCourseIds, onVideoViewCh
       courseId={course.id}
       sharePath={buildPublicCoursePath(course)}
       enableCourseActions
-      onOpenProfileHome={() => navigate('/student')}
+      onOpenProfileHome={() => navigate(STUDENT_WORKSPACE_PATH)}
       onLogout={onLogout}
       currentUserRole="student"
       onTitleChange={onTitleChange}
+      themeMode={videoThemeMode}
     />
   )
 }
@@ -325,7 +358,11 @@ function InstructorRoute({ onOpenCourse, onOpenInstructor, onAddCart, onPreview 
   )
 }
 
-function SubjectDetailRoute({ onSubjectNavigate, onVideoNavigate }) {
+function SubjectDetailRoute({
+  onSubjectNavigate,
+  onVideoNavigate,
+  videoThemeMode,
+}) {
   const { subject, subcategory, videoIndex } = useParams()
   const parsedIndex = Number.parseInt(videoIndex ?? '1', 10)
   const initialVideoIndex = Number.isNaN(parsedIndex) ? 0 : Math.max(0, parsedIndex - 1)
@@ -339,6 +376,7 @@ function SubjectDetailRoute({ onSubjectNavigate, onVideoNavigate }) {
       mode="detail"
       onSubjectNavigate={onSubjectNavigate}
       onVideoOpen={onVideoNavigate}
+      themeMode={videoThemeMode}
     />
   )
 }
@@ -346,6 +384,60 @@ function SubjectDetailRoute({ onSubjectNavigate, onVideoNavigate }) {
 function SubjectRouteRedirect() {
   const { subject } = useParams()
   return <Navigate to={`/subjects/${subject ?? 'computerscience'}/1`} replace />
+}
+
+function StudentWorkspaceRoute({
+  studentTab,
+  onTabChange,
+  renderMarketplace,
+  selectedCourse,
+  currentUserUid,
+  courses,
+  enrolledCourseIds,
+  enrolledVideoIds,
+  onVideoViewChange,
+  onOpenCourseView,
+  onOpenVideoView,
+  isStudentVideoView,
+}) {
+  const { workspaceTab } = useParams()
+  const resolvedTab = STUDENT_WORKSPACE_TAB_SEGMENTS[workspaceTab ?? 'student-report'] ?? 'Student Report'
+
+  useEffect(() => {
+    if (studentTab !== resolvedTab) {
+      onTabChange(resolvedTab)
+    }
+  }, [onTabChange, resolvedTab, studentTab])
+
+  return renderMarketplace(
+    <RoleWorkspaceLayout
+      title="Student workspace"
+      menu={workspaceMenu.student}
+      activeTab={resolvedTab}
+      onTabChange={(nextTab) => onTabChange(nextTab, true)}
+      fullWidth
+      singleView={false}
+    >
+      <StudentView
+        activeTab={resolvedTab}
+        selectedCourse={selectedCourse}
+        currentUserUid={currentUserUid}
+        courses={courses}
+        enrolledCourseIds={enrolledCourseIds}
+        enrolledVideoIds={enrolledVideoIds}
+        onVideoViewChange={onVideoViewChange}
+        onOpenCourseView={onOpenCourseView}
+        onOpenVideoView={onOpenVideoView}
+      />
+    </RoleWorkspaceLayout>,
+    {
+      showFooter: false,
+      hideFlashBanner: isStudentVideoView,
+      centered: false,
+      hideTopbar: isStudentVideoView,
+      hideFloatingAssistant: isStudentVideoView,
+    },
+  )
 }
 
 function AdminProtectedLayout({ authenticated, onLogout }) {
@@ -363,7 +455,7 @@ function App() {
   const [cartCourseIds, setCartCourseIds] = useState([])
   const [enrolledCourseIds, setEnrolledCourseIds] = useState([])
   const [enrolledVideoIds, setEnrolledVideoIds] = useState([])
-  const [studentTab, setStudentTab] = useState('My Learnings')
+  const [studentTab, setStudentTab] = useState('Student Report')
   const [instructorTab, setInstructorTab] = useState(workspaceMenu.instructor[0])
   const [previewState, setPreviewState] = useState(null)
   const [selectedCourseId, setSelectedCourseId] = useState(courses[0]?.id ?? null)
@@ -374,6 +466,7 @@ function App() {
   const [authError, setAuthError] = useState('')
   const [isStudentVideoView, setIsStudentVideoView] = useState(false)
   const [courseViewTitle, setCourseViewTitle] = useState('')
+  const [videoThemeMode, setVideoThemeMode] = useState('dark')
   const [activeCourseFeedback, setActiveCourseFeedback] = useState(null)
   const [courseShareMessage, setCourseShareMessage] = useState('')
   const lastHeartbeatAtRef = useRef(0)
@@ -448,6 +541,13 @@ function App() {
   useEffect(() => {
     if (!location.pathname.startsWith('/student')) {
       setIsStudentVideoView(false)
+    }
+  }, [location.pathname])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (location.pathname === '/login' || location.pathname === '/signup') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
     }
   }, [location.pathname])
 
@@ -627,7 +727,7 @@ function App() {
     setSelectedCourseId(courseId)
     setStudentTab('My Learnings')
     const course = allLearnerCourses.find((item) => item.id === courseId)
-    navigate(course ? buildStudentCoursePath(course) : '/student')
+    navigate(course ? buildStudentCoursePath(course) : STUDENT_MY_LEARNINGS_PATH)
   }
 
   const handlePublicLogout = async () => {
@@ -775,15 +875,19 @@ function App() {
       onOpenLocalChapters={() => scrollToHomeSection('explore-courses')}
       onOpenMyLearnings={() => {
         setStudentTab('My Learnings')
-        navigate(currentUserRole === 'student' ? '/student' : '/login')
+        navigate(currentUserRole === 'student' ? STUDENT_MY_LEARNINGS_PATH : '/login')
       }}
       onOpenMyProfile={() => {
         if (currentUserRole === 'student') {
           setStudentTab('My Profile')
-          navigate('/student')
+          navigate(buildStudentWorkspacePath('My Profile'))
           return
         }
         navigate('/login')
+      }}
+      onOpenStudentWorkspace={() => {
+        setStudentTab('Student Report')
+        navigate(currentUserRole === 'student' ? STUDENT_WORKSPACE_PATH : '/login')
       }}
       onLogoClick={() => navigate('/')}
       onOpenSubject={(subjectKey = 'computerscience') => navigate(`/subjects/${subjectKey}`)}
@@ -808,6 +912,9 @@ function App() {
       onLeaveReview={options.onLeaveReview}
       onShareCourse={options.onShareCourse}
       hideFloatingAssistant={options.hideFloatingAssistant ?? false}
+      showVideoThemeToggle={options.showVideoThemeToggle ?? false}
+      videoThemeMode={options.videoThemeMode ?? 'light'}
+      onToggleVideoTheme={options.onToggleVideoTheme}
     >
       {element}
     </MarketplaceFrame>
@@ -872,7 +979,7 @@ function App() {
               setSelectedCourseId(courseId)
               setStudentTab('My Learnings')
               const course = allLearnerCourses.find((item) => item.id === courseId)
-              navigate(course ? buildStudentCoursePath(course) : '/student')
+              navigate(course ? buildStudentCoursePath(course) : STUDENT_MY_LEARNINGS_PATH)
             }}
             onRegisterToEnroll={(redirectTo) => navigateToAuth('signup', redirectTo)}
             onLoginToEnroll={(redirectTo) => navigateToAuth('login', redirectTo)}
@@ -905,6 +1012,7 @@ function App() {
                 onVideoViewChange={setIsStudentVideoView}
                 onLogout={handlePublicLogout}
                 onTitleChange={setCourseViewTitle}
+                videoThemeMode={videoThemeMode}
               />,
               {
                 showFooter: false,
@@ -919,6 +1027,11 @@ function App() {
                   if (course) setActiveCourseFeedback({ courseId: course.id, courseTitle: course.title })
                 },
                 onShareCourse: () => void handleCourseShare(),
+                showVideoThemeToggle: true,
+                videoThemeMode,
+                onToggleVideoTheme: () => {
+                  setVideoThemeMode((currentMode) => (currentMode === 'dark' ? 'light' : 'dark'))
+                },
               },
             )
             : <Navigate to="/login" replace />
@@ -943,7 +1056,7 @@ function App() {
             cartCourses={cartCourses}
             instructorsById={instructorsById}
             onRemoveCart={removeFromCart}
-            onStartLearning={() => navigate(currentUserRole === 'student' ? '/student' : '/login')}
+            onStartLearning={() => navigate(currentUserRole === 'student' ? STUDENT_MY_LEARNINGS_PATH : '/login')}
           />,
           { showFooter: false },
         )}
@@ -954,8 +1067,19 @@ function App() {
           <SubjectDetailRoute
             onSubjectNavigate={handleSubjectRouteNavigate}
             onVideoNavigate={handleSubjectVideoOpen}
+            videoThemeMode={videoThemeMode}
           />,
-          { centered: false, showFooter: false, hideFlashBanner: true, hideFloatingAssistant: true },
+          {
+            centered: false,
+            showFooter: false,
+            hideFlashBanner: true,
+            hideFloatingAssistant: true,
+            showVideoThemeToggle: true,
+            videoThemeMode,
+            onToggleVideoTheme: () => {
+              setVideoThemeMode((currentMode) => (currentMode === 'dark' ? 'light' : 'dark'))
+            },
+          },
         )}
       />
       <Route path="/subjects/:subject" element={<SubjectRouteRedirect />} />
@@ -969,8 +1093,19 @@ function App() {
               <SubjectDetailRoute
                 onSubjectNavigate={handleStudentSubjectRouteNavigate}
                 onVideoNavigate={handleSubjectVideoOpen}
+                videoThemeMode={videoThemeMode}
               />,
-              { centered: false, showFooter: false, hideFlashBanner: true, hideFloatingAssistant: true },
+              {
+                centered: false,
+                showFooter: false,
+                hideFlashBanner: true,
+                hideFloatingAssistant: true,
+                showVideoThemeToggle: true,
+                videoThemeMode,
+                onToggleVideoTheme: () => {
+                  setVideoThemeMode((currentMode) => (currentMode === 'dark' ? 'light' : 'dark'))
+                },
+              },
             )
             : <Navigate to="/signup" replace state={{ redirectTo: location.pathname, requiredRole: 'student' }} />
         }
@@ -1025,41 +1160,91 @@ function App() {
             )
         }
       />
+      <Route path="/student" element={<Navigate to={STUDENT_WORKSPACE_PATH} replace />} />
       <Route
-        path="/student"
+        path="/student/my-learnings"
         element={
           !authStateReady
             ? renderMarketplace(<SessionRefreshScreen />, { showFooter: false, centered: false })
             : currentUserRole === 'student'
             ? renderMarketplace(
-            <RoleWorkspaceLayout
-                title="Student workspace"
-                menu={workspaceMenu.student}
-                activeTab={studentTab}
-                onTabChange={setStudentTab}
-                fullWidth
-                singleView={false}
-              >
-                <StudentView
-                  activeTab={studentTab}
-                  selectedCourse={selectedCourse}
-                  currentUserUid={currentUserUid}
-                  courses={allLearnerCourses}
-                  enrolledCourseIds={enrolledCourseIds}
-                  enrolledVideoIds={enrolledVideoIds}
-                  onVideoViewChange={setIsStudentVideoView}
-                  onOpenCourseView={(course) => navigate(buildStudentCoursePath(course))}
-                  onOpenVideoView={(course) => navigate(`/student/subjects/${course.subjectKey}/${course.subcategoryKey}/${course.videoIndex + 1}`)}
-                />
-              </RoleWorkspaceLayout>,
+              <StudentView
+                activeTab="My Learnings"
+                selectedCourse={selectedCourse}
+                currentUserUid={currentUserUid}
+                courses={allLearnerCourses}
+                enrolledCourseIds={enrolledCourseIds}
+                enrolledVideoIds={enrolledVideoIds}
+                onVideoViewChange={setIsStudentVideoView}
+                onOpenCourseView={(course) => navigate(buildStudentCoursePath(course))}
+                onOpenVideoView={(course) => navigate(`/student/subjects/${course.subjectKey}/${course.subcategoryKey}/${course.videoIndex + 1}`)}
+              />,
               {
-                showFooter: false,
-                hideFlashBanner: isStudentVideoView,
-                centered: false,
-                hideTopbar: isStudentVideoView,
-                hideFloatingAssistant: isStudentVideoView,
+                showFooter: true,
+                centered: true,
+                hideFlashBanner: false,
+                hideTopbar: false,
+                hideFloatingAssistant: false,
+                topbarTitleOnly: true,
+                topbarTitle: 'My Learnings',
               },
             )
+            : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/student/student-workspace"
+        element={
+          !authStateReady
+            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: false, centered: false })
+            : currentUserRole === 'student'
+            ? <StudentWorkspaceRoute
+                studentTab={studentTab}
+                onTabChange={(nextTab, shouldNavigate = false) => {
+                  setStudentTab(nextTab)
+                  if (shouldNavigate) {
+                    navigate(buildStudentWorkspacePath(nextTab))
+                  }
+                }}
+                renderMarketplace={renderMarketplace}
+                selectedCourse={selectedCourse}
+                currentUserUid={currentUserUid}
+                courses={allLearnerCourses}
+                enrolledCourseIds={enrolledCourseIds}
+                enrolledVideoIds={enrolledVideoIds}
+                onVideoViewChange={setIsStudentVideoView}
+                onOpenCourseView={(course) => navigate(buildStudentCoursePath(course))}
+                onOpenVideoView={(course) => navigate(`/student/subjects/${course.subjectKey}/${course.subcategoryKey}/${course.videoIndex + 1}`)}
+                isStudentVideoView={isStudentVideoView}
+              />
+            : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/student/student-workspace/:workspaceTab"
+        element={
+          !authStateReady
+            ? renderMarketplace(<SessionRefreshScreen />, { showFooter: false, centered: false })
+            : currentUserRole === 'student'
+            ? <StudentWorkspaceRoute
+                studentTab={studentTab}
+                onTabChange={(nextTab, shouldNavigate = false) => {
+                  setStudentTab(nextTab)
+                  if (shouldNavigate) {
+                    navigate(buildStudentWorkspacePath(nextTab))
+                  }
+                }}
+                renderMarketplace={renderMarketplace}
+                selectedCourse={selectedCourse}
+                currentUserUid={currentUserUid}
+                courses={allLearnerCourses}
+                enrolledCourseIds={enrolledCourseIds}
+                enrolledVideoIds={enrolledVideoIds}
+                onVideoViewChange={setIsStudentVideoView}
+                onOpenCourseView={(course) => navigate(buildStudentCoursePath(course))}
+                onOpenVideoView={(course) => navigate(`/student/subjects/${course.subjectKey}/${course.subcategoryKey}/${course.videoIndex + 1}`)}
+                isStudentVideoView={isStudentVideoView}
+              />
             : <Navigate to="/login" replace />
         }
       />
