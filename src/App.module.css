@@ -1,0 +1,11 @@
+.app {
+  min-height: 100vh;
+}
+
+.workspace {
+  width: calc(100% - (var(--page-gutter) * 2));
+  margin: 0 auto;
+  padding: 1.25rem 0 2rem;
+  display: grid;
+  gap: 1rem;
+}

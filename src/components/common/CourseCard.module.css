@@ -1,0 +1,122 @@
+.card {
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 1.4rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(31, 122, 85, 0.24);
+  box-shadow: 0 18px 40px rgba(31, 122, 85, 0.15);
+}
+
+.thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  border: 0;
+}
+
+.body {
+  padding: 1rem 1rem 1.05rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.partner {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--ink);
+  min-height: 2.7em;
+}
+
+.instructorLink {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.instructorLink:hover {
+  color: var(--brand-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.metaRow span {
+  font-size: 0.78rem;
+  color: var(--brand-dark);
+  border: 1px solid rgba(31, 122, 85, 0.12);
+  border-radius: 999px;
+  padding: 0.24rem 0.58rem;
+  background: var(--surface-soft);
+  font-weight: 700;
+}
+
+.ratingLine {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.84rem;
+}
+
+.freeTag {
+  margin: 0;
+  color: var(--accent-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.buttons {
+  margin-top: 0.1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.42rem;
+}
+
+.buttons :global(.btn-primary),
+.buttons :global(.btn-outline) {
+  width: 100%;
+  min-height: 42px;
+  font-size: 0.83rem;
+}
+
+.previewLink {
+  border: 0;
+  background: transparent;
+  color: var(--brand);
+  font-weight: 600;
+  padding: 0.25rem 0.2rem;
+  justify-self: start;
+  cursor: pointer;
+}
+
+.previewLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}

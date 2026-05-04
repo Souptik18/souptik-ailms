@@ -1,0 +1,331 @@
+.assistantDock {
+  position: fixed;
+  right: clamp(12px, 2vw, 24px);
+  bottom: clamp(16px, 2.6vw, 28px);
+  z-index: 40;
+  display: grid;
+  justify-items: end;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.assistantDock button,
+.assistantDock input,
+.chatPanel {
+  pointer-events: auto;
+}
+
+.iconShell {
+  position: relative;
+}
+
+.iconButton {
+  position: relative;
+  width: clamp(74px, 7vw, 92px);
+  height: clamp(74px, 7vw, 92px);
+  padding: 0;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.iconButton:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow: 0 24px 56px rgba(15, 23, 42, 0.22);
+}
+
+.iconWrap {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.iconVisual {
+  width: clamp(30px, 3vw, 38px);
+  height: clamp(30px, 3vw, 38px);
+  color: #1d4ed8;
+}
+
+.statusPulse {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  animation: pulseRing 2.4s ease-out infinite;
+}
+
+.iconBadge {
+  position: absolute;
+  right: 2px;
+  bottom: 5px;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+.minimizeButton,
+.reopenButton,
+.headerIconButton {
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.minimizeButton {
+  position: absolute;
+  top: -5px;
+  right: -3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+}
+
+.reopenButton {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
+}
+
+.chatPanel {
+  width: min(430px, calc(100vw - 24px));
+  height: min(720px, calc(100svh - 92px));
+  max-height: calc(100svh - 92px);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 18px;
+  background: #ffffff;
+  color: #0f172a;
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto auto auto;
+  overflow: hidden;
+  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.24);
+  animation: chatEnter 190ms ease-out both;
+}
+
+.chatHeader {
+  min-height: 72px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.95), rgba(255, 255, 255, 0.96)),
+    #ffffff;
+}
+
+.chatIdentity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.chatIdentity > span {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+}
+
+.chatIdentity div {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.chatIdentity strong {
+  font-size: 0.96rem;
+  line-height: 1.1;
+}
+
+.chatIdentity small {
+  color: #16a34a;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.headerIconButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+}
+
+.chatBody {
+  min-height: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(219, 234, 254, 0.78), transparent 15rem),
+    #f8fafc;
+}
+
+.messageBubble {
+  width: fit-content;
+  max-width: 88%;
+  border-radius: 16px;
+  padding: 0.68rem 0.78rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  animation: bubbleEnter 160ms ease-out both;
+}
+
+.assistantBubble {
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.userBubble {
+  align-self: flex-end;
+  border-bottom-right-radius: 5px;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.quickPrompts {
+  padding: 0.8rem 1rem 0;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+.quickPrompts button {
+  min-height: 34px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.chatComposer {
+  padding: 0.85rem 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  background: #ffffff;
+}
+
+.chatComposer input {
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: 0;
+  padding-inline: 0.8rem;
+}
+
+.chatComposer input:focus {
+  border-color: rgba(37, 99, 235, 0.46);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.chatComposer button {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.helpLink {
+  min-height: 46px;
+  border: 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  background: #ffffff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+@keyframes chatEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bubbleEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    opacity: 0.58;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@media (max-width: 760px) {
+  .assistantDock {
+    right: 8px;
+    bottom: 10px;
+  }
+
+  .chatPanel {
+    width: min(360px, calc(100vw - 16px));
+    height: min(660px, calc(100svh - 84px));
+    max-height: calc(100svh - 84px);
+  }
+}

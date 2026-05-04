@@ -1,0 +1,20 @@
+name = "kiitx-api-worker"
+main = "cloudflare/worker.js"
+compatibility_date = "2026-04-27"
+
+[vars]
+# Set in Cloudflare dashboard for production:
+# APP_ORIGIN = "https://your-frontend-domain.com"
+# FIREBASE_PROJECT_ID = "your-firebase-project-id"
+# SESSION_COOKIE_SECRET = "long-random-secret"
+# YOUTUBE_API_KEY = "youtube-api-key"
+# XAI_API_KEY = "xai-grok-api-key"
+# XAI_MODEL = "grok-4.20-reasoning"
+# GROQ_API_KEY = "groq-api-key"
+# GROQ_MODEL = "llama-3.3-70b-versatile"
+# RAPIDAPI_LINKEDIN_JOBS_KEY = "rapidapi-linkedin-jobs-key"
+
+[[kv_namespaces]]
+binding = "KIITX_STATE"
+id = "c4a0aba3719a4542a2ddeeb2232fca1a"
+preview_id = "c4a0aba3719a4542a2ddeeb2232fca1a"
