@@ -1,6 +1,7 @@
 # Souptik AILMS
 
-Souptik AILMS is a full-stack learning platform for public course discovery, student enrollment, LMS video learning, student analytics, secure authentication, and role-based workspace access.
+Souptik AILMS
+is a full-stack learning platform for public course discovery, student enrollment, LMS video learning, student analytics, secure authentication, and role-based workspace access.
 
 ## Hosted Project
 
