@@ -9,7 +9,8 @@ FIREBASE_PROJECT_ID = "e-kiitx"
 # APP_ORIGIN = "https://your-frontend-domain.com"
 # FIREBASE_PROJECT_ID = "your-firebase-project-id"
 # SESSION_COOKIE_SECRET = "long-random-secret"
-# YOUTUBE_API_KEY = "youtube-api-key"
+# YOUTUBE_API_KEY = "youtube-api-key"npx wrangler deploy
+
 # XAI_API_KEY = "xai-grok-api-key"
 # XAI_MODEL = "grok-4.20-reasoning"
 # GROQ_API_KEY = "groq-api-key"

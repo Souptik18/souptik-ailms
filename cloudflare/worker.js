@@ -1001,6 +1001,16 @@ async function getLinkedInJobs(env, searchParams) {
   }
 }
 
+function buildLinkedInJobsFallback(searchParams, freshness = '24h') {
+  return {
+    source: 'rapidapi-linkedin-fallback',
+    freshness: resolveLinkedInJobsFreshness(freshness),
+    title: sanitizeText(searchParams.get('title') || 'Data Engineer', 120),
+    location: sanitizeText(searchParams.get('location') || 'United States OR United Kingdom', 180),
+    jobs: [],
+  }
+}
+
 async function runOnboardingRoadmapCompletion(env, stage, role) {
   const stageTitle = sanitizeText(stage?.title, 120)
   const stageDetail = sanitizeText(stage?.detail, 120)
@@ -1194,7 +1204,11 @@ async function handleRequest(request, env) {
       const payload = await getLinkedInJobs(env, url.searchParams)
       return json(payload, 200, cors)
     } catch (error) {
-      return json({ error: error instanceof Error ? error.message : 'Unable to load LinkedIn jobs.' }, 502, cors)
+      const fallback = buildLinkedInJobsFallback(url.searchParams, url.searchParams.get('freshness'))
+      return json({
+        ...fallback,
+        error: error instanceof Error ? error.message : 'Unable to load LinkedIn jobs.',
+      }, 200, cors)
     }
   }
 
