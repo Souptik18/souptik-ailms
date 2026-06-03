@@ -210,7 +210,7 @@ function Topbar({
       {isAdminRoute && (
         <div className={styles.adminBanner}>
           <div>
-            <p>KIITX Admin Console</p>
+            <p>Online Origins Admin Console</p>
             <span>Accessible only with `url-admin` route</span>
           </div>
           <div className={styles.adminBannerActions}>

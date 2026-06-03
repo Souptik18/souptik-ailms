@@ -57,7 +57,7 @@ function LoginPage({ onLogin }) {
           <CardContent>
             <form className="grid gap-5" onSubmit={submit}>
               <FormField label="Email" error={form.formState.errors.email?.message}>
-                <Input {...form.register('email')} placeholder="admin@kiitx.in" />
+                <Input {...form.register('email')} placeholder="admin@onlineorigins.in" />
               </FormField>
               <FormField label="Password" error={form.formState.errors.password?.message}>
                 <Input {...form.register('password')} type="password" placeholder="Enter password" />

@@ -31,7 +31,7 @@ function TopNavbar({ onLogout }) {
             <button className="flex h-11 items-center gap-3 rounded-2xl border border-border bg-background px-3 text-sm font-medium">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">KS</div>
               <div className="text-left">
-                <p>KIITX Admin</p>
+                <p>Online Origins Admin</p>
                 <p className="text-xs text-muted-foreground">Workspace owner</p>
               </div>
             </button>

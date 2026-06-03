@@ -141,4 +141,4 @@ export const workspaceMenu = {
   admin: ['Homepage', 'Users', 'Moderation', 'Reports', 'Settings'],
 }
 
-export const ADMIN_EMAIL = 'admin@kiitx.in'
+export const ADMIN_EMAIL = 'admin@onlineorigins.in'

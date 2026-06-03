@@ -7,7 +7,7 @@ function CourseCard({ course, instructor, onOpen, onInstructor, onAddCart, onPre
       <img src={thumbnailUrl(course.youtubeId)} alt={course.title} className={styles.thumb} loading="lazy" />
 
       <div className={styles.body}>
-        <p className={styles.partner}>KIITX Professional Certificate</p>
+        <p className={styles.partner}>Online Origins Professional Certificate</p>
         <h3>{course.title}</h3>
 
         <button className={styles.instructorLink} type="button" onClick={() => onInstructor(instructor.id)}>

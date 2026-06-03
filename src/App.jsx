@@ -1047,7 +1047,7 @@ function App() {
       if (navigator.share) {
         await navigator.share({
           title: course.title,
-          text: `Preview ${course.title} on KIITX.`,
+          text: `Preview ${course.title} on Online Origins.`,
           url: shareUrl,
         })
       } else if (navigator.clipboard?.writeText) {

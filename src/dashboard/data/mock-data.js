@@ -146,13 +146,13 @@ export const settingsSections = [
 ]
 
 export const defaultLogin = {
-  email: 'admin@kiitx.in',
+  email: 'admin@onlineorigins.in',
   password: 'password123',
 }
 
 export const brandMeta = {
-  name: 'KIITX NPTEL',
-  descriptor: 'SaaS LMS Control Center',
+  name: 'Online Origins',
+  descriptor: 'Admin Control Center',
   learners: '18,400',
   mentors: '42',
   icon: GraduationCap,

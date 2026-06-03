@@ -18,8 +18,8 @@ function SettingsPage() {
   const form = useForm({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
-      workspaceName: 'KIITX NPTEL',
-      adminEmail: 'admin@kiitx.in',
+      workspaceName: 'Online Origins',
+      adminEmail: 'admin@onlineorigins.in',
       digestTime: '08:30 AM',
     },
   })
